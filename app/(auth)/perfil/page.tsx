@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { User, Pencil, Save, X, Upload, Loader2, AlertTriangle } from "lucide-react"
-//import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 type Profile = {
   id: string
@@ -39,8 +39,7 @@ type Profile = {
 }
 
 export default function PerfilPage() {
-  //prueba jefe
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([])
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -51,7 +50,6 @@ export default function PerfilPage() {
   const [activeTab, setActiveTab] = useState("personal")
   const [debugInfo, setDebugInfo] = useState<string[]>([])
   const [usingSampleData, setUsingSampleData] = useState(false)
-  //const router = useRouter()
   const supabase = createClientComponentClient()
 
   // Función para añadir información de depuración
@@ -65,7 +63,7 @@ export default function PerfilPage() {
     try {
       addDebugInfo(`Intentando crear perfil para usuario: ${userId}`)
 
-      // Crear un perfil con datos de ejemplo
+      // Crear un perfil con datos mínimos
       const newProfile = {
         id: userId,
       }
@@ -164,6 +162,52 @@ export default function PerfilPage() {
     fetchProfile()
   }, [])
 
+  // Cargar todos los perfiles para el campo jefe_directo
+  useEffect(() => {
+    console.log("🔄 Iniciando fetch de jefes directos...")
+
+    const fetchProfiles = async () => {
+      try {
+        // Asegúrate que esta tabla y relaciones existen en tu BD
+        const { data, error } = await supabase
+          .from("jefes_directos")
+          .select("id, id_empleado (id, nombre)")
+
+        if (error) {
+          console.error("❌ Error al cargar jefes directos:", error.message)
+          addDebugInfo(`Error al cargar jefes directos: ${error.message}`)
+          return
+        }
+
+        console.log("✅ Datos recibidos de Supabase:", data)
+
+        if (!data || data.length === 0) {
+          console.warn("⚠️ No se encontraron jefes directos.")
+          addDebugInfo("No se encontraron jefes directos.")
+          setProfiles([])
+          return
+        }
+
+        data.forEach((item: any, index: number) => {
+          console.log(`📦 Item #${index + 1}:`, item)
+          console.log("↪️ id_empleado contenido:", item.id_empleado)
+        })
+
+        const perfilesJefes = data.map((item: any) => item.id_empleado)
+
+        console.log("🧩 Perfiles extraídos (id_empleado):", perfilesJefes)
+
+        setProfiles(perfilesJefes)
+        addDebugInfo(`Se cargaron ${perfilesJefes.length} jefes.`)
+      } catch (err: any) {
+        console.error("🔥 Error inesperado:", err.message)
+        addDebugInfo(`Error inesperado: ${err.message}`)
+      }
+    }
+
+    fetchProfiles()
+  }, [])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     if (!formData) return
 
@@ -189,57 +233,6 @@ export default function PerfilPage() {
         setEditing(false)
         return
       }
-
-      useEffect(() => {
-    const checkSession = async () => {
-      const { data: sessionData, error } = await supabase.auth.getSession();
-      if (error) {
-        addDebugInfo(`❌ Error al obtener la sesión: ${error.message}`);
-      } else if (!sessionData.session) {
-        addDebugInfo("⚠️ No hay sesión activa.");
-      } else {
-        addDebugInfo("✅ Sesión activa detectada.");
-        console.log("Usuario:", sessionData.session.user);
-      }
-    };
-    checkSession();
-  }, []);
-
-      //cargar jefes directos
- useEffect(() => {
-    const fetchProfiles = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("id, nombre");
-
-        if (error) {
-          console.error("Error al cargar perfiles:", error.message);
-          addDebugInfo(`❌ Error al cargar perfiles: ${error.message}`);
-          return;
-        }
-
-        if (!data || data.length === 0) {
-          addDebugInfo("⚠️ No se encontraron perfiles disponibles.");
-        } else {
-          setProfiles(data);
-          addDebugInfo(`✅ Se cargaron ${data.length} perfiles.`);
-          console.log("Perfiles:", data);
-        }
-      } catch (err: any) {
-        console.error("Error inesperado:", err.message);
-        addDebugInfo(`❌ Error inesperado: ${err.message}`);
-      }
-    };
-
-    fetchProfiles();
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-          //finaliza jefes directos
 
       // Obtener la sesión actual
       const session = await getSession()
@@ -267,91 +260,89 @@ export default function PerfilPage() {
     setError(null)
   }
 
-  //avatar
-const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0]
-  if (!file || !profile) return
+  // Avatar upload handler
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !profile) return
 
-  try {
-    setUploading(true)
-    setError(null)
+    try {
+      setUploading(true)
+      setError(null)
 
-    if (usingSampleData) {
-      setTimeout(() => {
-        setSuccess("Foto de perfil actualizada correctamente (modo simulación)")
-        setUploading(false)
-      }, 1500)
-      return
+      if (usingSampleData) {
+        setTimeout(() => {
+          setSuccess("Foto de perfil actualizada correctamente (modo simulación)")
+          setUploading(false)
+        }, 1500)
+        return
+      }
+
+      // Obtener la sesión actual
+      const session = await getSession()
+      if (!session) throw new Error("No hay sesión activa")
+
+      // Crear un nombre de archivo único
+      const fileExt = file.name.split(".").pop()
+      const fileName = `${profile.id}/${file.name}`
+      const filePath = fileName
+
+      const { error: uploadError } = await supabase.storage
+        .from("archivos-intra")
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from("archivos-intra")
+        .createSignedUrl(filePath, 60 * 60)
+
+      if (signedUrlError || !signedUrlData?.signedUrl) {
+        throw signedUrlError || new Error("No se pudo generar la URL firmada")
+      }
+
+      const signedUrl = signedUrlData.signedUrl
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ foto_url: filePath })
+        .eq("id", profile!.id)
+
+      if (updateError) throw updateError
+
+      setProfile({
+        ...profile!,
+        foto_url: filePath,
+      })
+
+      setSuccess("Foto de perfil actualizada correctamente")
+    } catch (error: any) {
+      console.error("Error al subir avatar:", error)
+      setError(error.message)
+    } finally {
+      setUploading(false)
     }
-
-    // Obtener la sesión actual
-    const session = await getSession()
-    if (!session) throw new Error("No hay sesión activa")
-
-    // Crear un nombre de archivo único
-    const fileExt = file.name.split(".").pop()
-    const fileName = `${profile.id}/${file.name}`
-    const filePath = fileName
-
-    const { error: uploadError } = await supabase.storage
-      .from("archivos-intra")
-      .upload(filePath, file)
-
-    if (uploadError) throw uploadError
-
-    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-      .from("archivos-intra")
-      .createSignedUrl(filePath, 60 * 60) 
-
-    if (signedUrlError || !signedUrlData?.signedUrl) {
-      throw signedUrlError || new Error("No se pudo generar la URL firmada")
-    }
-
-    const signedUrl = signedUrlData.signedUrl
-
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({ foto_url: filePath })
-      .eq("id", profile!.id)
-
-    if (updateError) throw updateError
-
-    setProfile({
-      ...profile!,
-      foto_url: filePath,
-    })
-
-    setSuccess("Foto de perfil actualizada correctamente")
-  } catch (error: any) {
-    console.error("Error al subir avatar:", error)
-    setError(error.message)
-  } finally {
-    setUploading(false)
-  }
-}
-
-const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-
-useEffect(() => {
-  const fetchSignedUrl = async () => {
-    if (!profile?.foto_url) return
-
-    const { data, error } = await supabase.storage
-      .from("archivos-intra")
-      .createSignedUrl(profile.foto_url, 60 * 60) 
-
-    if (error) {
-      console.error("Error creando signed URL:", error)
-      return
-    }
-
-    setAvatarUrl(data.signedUrl)
   }
 
-  fetchSignedUrl()
-}, [profile?.foto_url])
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
-//finaliza avatar
+  useEffect(() => {
+    const fetchSignedUrl = async () => {
+      if (!profile?.foto_url) return
+
+      const { data, error } = await supabase.storage
+        .from("archivos-intra")
+        .createSignedUrl(profile.foto_url, 60 * 60)
+
+      if (error) {
+        console.error("Error creando signed URL:", error)
+        return
+      }
+
+      setAvatarUrl(data.signedUrl)
+    }
+
+    fetchSignedUrl()
+  }, [profile?.foto_url])
 
   // Mostrar estado de carga
   if (loading) {
@@ -611,7 +602,11 @@ useEffect(() => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">Jefe directo</p>
-                          <p>{profile?.jefe_directo || "No especificado"}</p>
+                          <p>
+                            {profile?.jefe_directo
+                              ? profiles.find(p => p.id === profile.jefe_directo)?.nombre || "No especificado"
+                              : "No especificado"}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -937,6 +932,7 @@ useEffect(() => {
                       </div>
                     </div>
 
+                    {/*div jefe directo*/}
                     <div>
                       <label htmlFor="jefe_directo" className="block text-sm font-medium text-gray-700 mb-1">
                         Jefe directo

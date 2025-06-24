@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { Loader2 } from "lucide-react"
+import { Mosaic } from "react-loading-indicators"
 
 export type EmpleadoData = {
   id: string
@@ -65,9 +65,9 @@ export default function DirectorioPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-6 flex flex-col items-center justify-center min-h-[50vh]">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
-        <p className="text-gray-600">Cargando directorio de empleados...</p>
+        <div className="flex flex-col items-center justify-center min-h-screen">
+        <Mosaic color="#2464ec" size="medium" />
+        <p className="text-gray-600 mt-4">Cargando directorio de empleados...</p>
       </div>
     )
   }

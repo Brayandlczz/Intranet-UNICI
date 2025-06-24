@@ -13,7 +13,7 @@ export type EmpleadoData = {
   telefono?: string
   foto_url?: string
 }
-
+ 
 export default function DirectorioPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Textarea } from "@/components/ui/textarea"
+//import { Textarea } from "@/components/ui/textarea"
 import { Mosaic } from "react-loading-indicators"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+  import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export default function SolicitudCumpleanosForm() {
   const [perfil, setPerfil] = useState<null | {
@@ -16,6 +16,7 @@ export default function SolicitudCumpleanosForm() {
     nombre: string
     departamento: string
     puesto: string
+    fecha_nacimiento: string
   }>(null)
 
   const [loading, setLoading] = useState(true)
@@ -45,7 +46,7 @@ export default function SolicitudCumpleanosForm() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, nombre, departamento, puesto")
+        .select("id, nombre, departamento, puesto, fecha_nacimiento")
         .eq("id", user.id)
         .single()
 
@@ -162,24 +163,27 @@ export default function SolicitudCumpleanosForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="fecha_cumpleaños">Fecha de cumpleaños</Label>
-            <Input id="fecha_cumpleaños" name="fecha_cumpleaños" type="date" required />
+            <Label htmlFor="fecha_cumpleaños">Fecha de nacimiento</Label>
+            <Input
+              id="fecha_cumpleaños"
+              name="fecha_cumpleaños"
+              type="date"
+              readOnly
+              value={perfil?.fecha_nacimiento?.split("T")[0] || ""}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="fecha_dia_libre">Fecha para tomar el día libre</Label>
-            <Input id="fecha_dia_libre" name="fecha_dia_libre" type="date" required />
+            <Input
+              id="fecha_dia_libre"
+              name="fecha_dia_libre"
+              type="date"
+              readOnly
+              value={perfil?.fecha_nacimiento?.split("T")[0] || ""}
+            />
           </div>
-        </div>
-
-        <div className="space-y-2 mt-4">
-          <Label htmlFor="motivo">Comentarios adicionales (opcional)</Label>
-          <Textarea
-            id="motivo"
-            name="motivo"
-            placeholder="Comentarios adicionales sobre tu solicitud... ¡UNICI te desea un felíz cumpleaños!"
-          />
-        </div>
+          </div>
       </SolicitudFormBase>
     </div>
   )

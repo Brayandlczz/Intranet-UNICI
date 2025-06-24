@@ -1,10 +1,10 @@
 "use client"
-
+ 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useEffect, useState } from "react"
-import { LayoutDashboard, User, Calendar, BookOpen, Bell, LogOut, Menu, X,  FileText, FilePen, Megaphone, Users, Cake, Sunset } from "lucide-react"
+import { LayoutDashboard, User, Calendar, BookOpen, Bell, LogOut, Menu, X,  FileText, FilePen, Megaphone, Users, Cake, Sunset, Handshake } from "lucide-react"
 
 type Profile = {
   id: string
@@ -125,7 +125,7 @@ useEffect(() => {
             </div>
               </Link>
               <div className="flex flex-col">
-                <span className="font-medium">
+                <span className="font-medium"> {/*whitespace-nowrap eliminado*/}
                   {profile.nombre ? `${profile.nombre}` : profile.email || "Usuario"}
                 </span>
                 <span className="text-xs text-gray-500">Rol: {profile.roles?.nombre || "nop"}</span>
@@ -312,6 +312,17 @@ useEffect(() => {
         >
           <Sunset size={20} />
           <span>Gestión de Vacaciones</span>
+        </Link>
+                <Link
+          href="/admin/jefes"
+          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
+            isActive("/admin/jefes")
+              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
+              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
+          }`}
+        >
+          <Handshake size={20} />
+          <span>Coordinadores & Encargados</span>
         </Link>
       </li>
     </ul>

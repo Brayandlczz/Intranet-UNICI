@@ -34,10 +34,11 @@ const UserManagementView: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState("Todos los roles");
   const [search, setSearch] = useState("");
 
-  const filteredUsers = users.filter(user =>
-    (roleFilter === "Todos los roles" || user.role === roleFilter) &&
-    (user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase()))
+  const filteredUsers = users.filter(
+    (user) =>
+      (roleFilter === "Todos los roles" || user.role === roleFilter) &&
+      (user.name.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -67,47 +68,47 @@ const UserManagementView: React.FC = () => {
           </Select>
         </div>
 
-        <table className="w-full table-auto border-t">
-          <thead>
-            <tr className="text-left">
-              <th className="py-2">Nombre</th>
-              <th>Correo</th>
-              <th>Rol</th>
-              <th>Departamento</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user, index) => (
-              <tr key={index} className="border-t">
-                <td className="py-2 flex items-center gap-2">
-                  {user.name}
-                </td>
-                <td>{user.email}</td>
-                <td>
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
-                    {user.role}
-                  </span>
-                </td>
-                <td>{user.department}</td>
-                <td>
-                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
-                    {user.status}
-                  </span>
-                </td>
-                <td className="flex gap-2">
-                  <Button variant="outline" size="icon">
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  <Button variant="outline" size="icon" className="text-red-600">
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </td>
+        <div className="overflow-auto">
+          <table className="w-full table-auto border-t min-w-[600px]">
+            <thead>
+              <tr className="text-left">
+                <th className="py-2">Nombre</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Departamento</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredUsers.map((user, index) => (
+                <tr key={index} className="border-t">
+                  <td className="py-2 flex items-center gap-2">{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                      {user.role}
+                    </span>
+                  </td>
+                  <td>{user.department}</td>
+                  <td>
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                      {user.status}
+                    </span>
+                  </td>
+                  <td className="flex gap-2">
+                    <Button variant="outline" size="icon">
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" className="text-red-600">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
