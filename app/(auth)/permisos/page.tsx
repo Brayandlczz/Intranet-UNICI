@@ -124,7 +124,7 @@ export default function SolicitudPermisosForm() {
     <div className="max-w-3xl mx-auto">
       <div className="mb-6 flex items-center">
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push("/solicitudes")}
           className="mr-4 p-2 rounded-full hover:bg-gray-100"
           aria-label="Volver"
         >
@@ -133,30 +133,30 @@ export default function SolicitudPermisosForm() {
         <h1 className="text-xl font-semibold">Volver</h1>
       </div>
 
-      <SolicitudFormBase title="Nueva Solicitud de permiso" onSubmit={handleSubmit}>
-        <h2 className="text-center">Complete el formulario para solicitar un permiso de ausencia.</h2>
+      <SolicitudFormBase title="Solicitud de permiso" onSubmit={handleSubmit}>
+        <h2 className="text-center">Complete el formulario para solicitar un permiso por ausencia.</h2>
 
-        <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6 cursor-not-allowed">
+        <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6">
           <h3 className="text-lg font-semibold">Datos del solicitante</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label htmlFor="fecha_solicitud">Fecha de solicitud</Label>
-              <Input id="fecha_solicitud" name="fecha_solicitud" type="date" readOnly value={fechaActual} />
+              <Input id="fecha_solicitud" name="fecha_solicitud" type="date" readOnly value={fechaActual} className="cursor-not-allowed"/>
             </div>
 
             <div className="space-y-1">
               <Label>Nombre completo</Label>
-              <Input readOnly value={perfil?.nombre || ""} />
+              <Input readOnly value={perfil?.nombre || ""} className="cursor-not-allowed"/>
             </div>
 
             <div className="space-y-1">
               <Label>Departamento</Label>
-              <Input readOnly value={perfil?.departamento || ""} />
+              <Input readOnly value={perfil?.departamento || ""} className="cursor-not-allowed"/>
             </div>
 
             <div className="space-y-1">
               <Label>Puesto</Label>
-              <Input readOnly value={perfil?.puesto || ""} />
+              <Input readOnly value={perfil?.puesto || ""} className="cursor-not-allowed"/>
             </div>
           </div>
         </div>

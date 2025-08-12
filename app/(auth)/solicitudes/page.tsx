@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { CalendarDays, Clock, Cake, HeartPulse, TreePalm } from "lucide-react";
+import { CalendarDays, Clock, Cake, HeartPulse, TreePalm, Plane } from "lucide-react";
 
 export default function GestorSolicitudes() {
   const solicitudes = [
@@ -35,6 +35,12 @@ export default function GestorSolicitudes() {
       descripcion: "Solicita un periodo vacacional utilizando tus días disponibles.",
       ruta: "/vacaciones",
       icono : <TreePalm className="h-6 w-6 text-blue-600"/>,
+    },
+    {
+      titulo: "Solicitud de viáticos",
+      descripcion: "Solicita viáticos para cubrir gastos relacionados con actividades laborales autorizadas.",
+      ruta: "/vacaciones",
+      icono : <Plane className="h-6 w-6 text-blue-600"/>,
     },
   ];
 

@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
-//import { Textarea } from "@/components/ui/textarea"
 import { Mosaic } from "react-loading-indicators"
-  import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export default function SolicitudCumpleanosForm() {
   const [perfil, setPerfil] = useState<null | {
@@ -22,8 +21,16 @@ export default function SolicitudCumpleanosForm() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter();
-  const fechaActual = new Date().toISOString().split("T")[0]
+  const [habilitado, setHabilitado] = useState(false)
+  const router = useRouter()
+  const fechaActual = new Date()
+
+  const formatDateLocal = (date: Date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
+  }
 
   useEffect(() => {
     const supabase = createClientComponentClient()
@@ -57,15 +64,38 @@ export default function SolicitudCumpleanosForm() {
         setError("No se encontró el perfil del usuario.")
       } else {
         setPerfil(data)
+        if (data.fecha_nacimiento) {
+          verificarHabilitado(data.fecha_nacimiento)
+        }
       }
 
       setLoading(false)
+    }
+
+    const verificarHabilitado = (fechaNacimientoStr: string) => {
+      const fechaNacimiento = new Date(fechaNacimientoStr)
+      const anioActual = fechaActual.getFullYear()
+
+      const fechaCumpleanos = new Date(anioActual, fechaNacimiento.getMonth(), fechaNacimiento.getDate())
+      const fechaInicio = new Date(fechaCumpleanos)
+      fechaInicio.setDate(fechaCumpleanos.getDate() - 15)
+
+      if (fechaActual >= fechaInicio && fechaActual <= fechaCumpleanos) {
+        setHabilitado(true)
+      } else {
+        setHabilitado(false)
+      }
     }
 
     fetchPerfil()
   }, [])
 
   const handleSubmit = async (formData: any) => {
+    if (!habilitado) {
+      alert("No puedes levantar la solicitud fuera del periodo permitido.")
+      return { success: false, message: "Solicitud bloqueada fuera del periodo permitido" }
+    }
+
     const supabase = createClientComponentClient()
 
     if (!perfil) {
@@ -79,14 +109,12 @@ export default function SolicitudCumpleanosForm() {
 
       const payload = {
         empleado_id: perfil.id,
-        fecha_solicitud: fechaActual,
+        fecha_solicitud: formatDateLocal(fechaActual),
         fecha_cumpleaños,
         fecha_dia_libre,
         motivo,
         estado: "pendiente",
       }
-
-      console.log("Datos a insertar:", payload)
 
       const { error } = await supabase.from("solicitud_cumpleaños").insert([payload])
 
@@ -98,7 +126,7 @@ export default function SolicitudCumpleanosForm() {
 
       setTimeout(() => {
         router.push("/solicitudes")
-      }, 1500) 
+      }, 1500)
 
       return { success: true, message: "Solicitud guardada correctamente." }
     } catch (error: any) {
@@ -111,12 +139,25 @@ export default function SolicitudCumpleanosForm() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <Mosaic color="#2464ec" size="medium" />
+        <p className="mt-4 text-gray-600 text-center">Cargando, por favor espere...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return <div className="text-red-600 font-semibold">{error}</div>
+  }
+
   if (isSubmitting) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <Mosaic color="#2464ec" size="medium" />
         <p className="mt-4 text-gray-600 text-center">Redirigiendo, por favor espere...</p>
-      </div>  
+      </div>
     )
   }
 
@@ -124,7 +165,7 @@ export default function SolicitudCumpleanosForm() {
     <div className="max-w-3xl mx-auto">
       <div className="mb-6 flex items-center">
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push("/solicitudes")}
           className="mr-4 p-2 rounded-full hover:bg-gray-100"
           aria-label="Volver"
         >
@@ -133,58 +174,89 @@ export default function SolicitudCumpleanosForm() {
         <h1 className="text-xl font-semibold">Volver</h1>
       </div>
 
-      <SolicitudFormBase title="Solicitud de permiso por día de cumpleaños" onSubmit={handleSubmit}>
-          <h2 className="text-center">Complete el formulario para solicitar su día por cumpleaños.</h2>
-          <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6 cursor-not-allowed">
+      {!habilitado ? (
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md border border-red-300">
+          <p>
+            No puedes levantar la solicitud fuera del período permitido (15 días previos a tu fecha de cumpleaños
+            hasta el día de tu cumpleaños).
+          </p>
+        </div>
+      ) : (
+        <SolicitudFormBase title="Solicitud de permiso por día de cumpleaños" onSubmit={handleSubmit}>
+          <h2 className="text-center">Complete el formulario para solicitar tu día por cumpleaños.</h2>
+          <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6">
             <h3 className="text-lg font-semibold">Datos del solicitante</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <Label htmlFor="fecha_solicitud">Fecha de solicitud</Label>
-                <Input id="fecha_solicitud" name="fecha_solicitud" type="date" readOnly value={fechaActual} />
+                <Input
+                  id="fecha_solicitud"
+                  name="fecha_solicitud"
+                  type="date"
+                  readOnly
+                  disabled
+                  value={formatDateLocal(fechaActual)}
+                />
               </div>
 
               <div className="space-y-1">
                 <Label>Nombre completo</Label>
-                <Input readOnly value={perfil?.nombre || ""} />
+                <Input readOnly disabled value={perfil?.nombre || ""} />
               </div>
 
               <div className="space-y-1">
                 <Label>Departamento</Label>
-                <Input readOnly value={perfil?.departamento || ""} />
+                <Input readOnly disabled value={perfil?.departamento || ""} />
               </div>
 
               <div className="space-y-1">
                 <Label>Puesto</Label>
-                <Input readOnly value={perfil?.puesto || ""} />
+                <Input readOnly disabled value={perfil?.puesto || ""} />
               </div>
             </div>
           </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="fecha_cumpleaños">Fecha de nacimiento</Label>
-            <Input
-              id="fecha_cumpleaños"
-              name="fecha_cumpleaños"
-              type="date"
-              readOnly
-              value={perfil?.fecha_nacimiento?.split("T")[0] || ""}
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="fecha_cumpleaños">Fecha de nacimiento</Label>
+              <Input
+                id="fecha_cumpleaños"
+                name="fecha_cumpleaños"
+                type="date"
+                readOnly
+                disabled
+                value={perfil?.fecha_nacimiento ? formatDateLocal(new Date(perfil.fecha_nacimiento)) : ""}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="fecha_dia_libre">Fecha para tomar el día libre</Label>
-            <Input
-              id="fecha_dia_libre"
-              name="fecha_dia_libre"
-              type="date"
-              readOnly
-              value={perfil?.fecha_nacimiento?.split("T")[0] || ""}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="fecha_dia_libre">Fecha para tomar el día libre</Label>
+              <Input
+                id="fecha_dia_libre"
+                name="fecha_dia_libre"
+                type="date"
+                readOnly
+                disabled
+                value={
+                  perfil?.fecha_nacimiento
+                    ? (() => {
+                        const nacimiento = new Date(perfil.fecha_nacimiento)
+                        const actual = new Date()
+                        const diaLibre = new Date(
+                          actual.getFullYear(),
+                          nacimiento.getMonth(),
+                          nacimiento.getDate()
+                        )
+                        return formatDateLocal(diaLibre)
+                      })()
+                    : ""
+                }
+              />
+            </div>
           </div>
-          </div>
-      </SolicitudFormBase>
+        </SolicitudFormBase>
+      )}
     </div>
   )
 }

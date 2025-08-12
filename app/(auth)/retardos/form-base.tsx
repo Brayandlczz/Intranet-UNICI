@@ -1,11 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "@/components/ui/use-toast"
+import { Mosaic } from "react-loading-indicators" 
 
 export type SolicitudBaseProps = {
   title: string
@@ -41,11 +41,8 @@ export function SolicitudFormBase({
           title: "Solicitud enviada",
           description: result.message,
         })
-        console.log("Formulario a resetear:", e.currentTarget)
         if (e.currentTarget) {
           e.currentTarget.reset()
-        } else {
-          console.warn("No se encontró el formulario para resetear")
         }
       } else {
         toast({
@@ -67,22 +64,30 @@ export function SolicitudFormBase({
   }
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-center">{title}</CardTitle>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">{children}</CardContent>
-        <CardFooter className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {isSubmitting ? "Enviando..." : submitButtonText}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+    <div className="relative">
+      {isSubmitting && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+          <Mosaic color="#2563eb" size="medium" />
+        </div>
+      )}
+
+      <Card className="w-full max-w-3xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-center">{title}</CardTitle>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">{children}</CardContent>
+          <CardFooter className="flex justify-end">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {isSubmitting ? "Enviando..." : submitButtonText}
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   )
 }

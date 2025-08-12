@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { useEffect, useState } from "react"
-import {Mosaic} from "react-loading-indicators"
+import { Mosaic } from "react-loading-indicators"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export default function SolicitudIncapacidadesForm() {
@@ -16,6 +16,7 @@ export default function SolicitudIncapacidadesForm() {
     nombre: string
     departamento: string
     puesto: string
+    hora_entrada?: string
   }>(null)
 
   const [loading, setLoading] = useState(true)
@@ -43,20 +44,32 @@ export default function SolicitudIncapacidadesForm() {
         return
       }
 
-       const { data, error } = await supabase
+      const { data: perfilData, error: perfilError } = await supabase
         .from("profiles")
         .select("id, nombre, departamento, puesto")
         .eq("id", user.id)
         .single()
 
-      if (error) {
-        console.error("Error al obtener perfil:", error)
-        setError("No se pudo cargar el perfil del usuario.")
-      } else if (!data) {
+      if (perfilError || !perfilData) {
         setError("No se encontró el perfil del usuario.")
-      } else {
-        setPerfil(data)
+        setLoading(false)
+        return
       }
+
+      const { data: entradaData, error: entradaError } = await supabase
+        .from("entrada_laboral")
+        .select("hora_entrada")
+        .eq("id", user.id)
+        .single()
+
+      if (entradaError) {
+        console.error("Error al obtener hora de entrada:", entradaError)
+      }
+
+      setPerfil({
+        ...perfilData,
+        hora_entrada: entradaData?.hora_entrada || "",
+      })
 
       setLoading(false)
     }
@@ -64,28 +77,28 @@ export default function SolicitudIncapacidadesForm() {
     fetchPerfil()
   }, [])
 
-  const handleSubmit = async (formData: any)=> {
+  const handleSubmit = async (formData: any) => {
     const supabase = createClientComponentClient()
 
-  if (!perfil) {
-    return { success : false, message: "No se pudo obtener el perfil del usuario"}
-  }
-
-  setIsSubmitting(true)
-
-  try {
-    const { fecha_retardo, hora_llegada, hora_establecida, motivo }  = formData
-
-    const payload = {
-      empleado_id: perfil.id,
-      fecha_solicitud: fechaActual,
-      fecha_retardo,
-      hora_llegada,
-      hora_establecida,
-      motivo,
-      estado: "pendiente"
+    if (!perfil) {
+      return { success: false, message: "No se pudo obtener el perfil del usuario" }
     }
-  
+
+    setIsSubmitting(true)
+
+    try {
+      const { hora_llegada, hora_establecida, motivo } = formData
+
+      const payload = {
+        empleado_id: perfil.id,
+        fecha_solicitud: fechaActual,
+        fecha_retardo: fechaActual,
+        hora_llegada,
+        hora_establecida,
+        motivo,
+        estado: "pendiente",
+      }
+
       console.log("Datos a insertar:", payload)
 
       const { error } = await supabase.from("solicitud_retardo").insert([payload])
@@ -98,7 +111,7 @@ export default function SolicitudIncapacidadesForm() {
 
       setTimeout(() => {
         router.push("/solicitudes")
-      }, 1500) 
+      }, 1500)
 
       return { success: true, message: "Solicitud guardada correctamente." }
     } catch (error: any) {
@@ -111,12 +124,21 @@ export default function SolicitudIncapacidadesForm() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <Mosaic color="#2464ec" size="medium" />
+        <p className="mt-4 text-gray-600 text-center">Cargando datos del solicitante...</p>
+      </div>
+    )
+  }
+
   if (isSubmitting) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <Mosaic color="#2464ec" size="medium" />
         <p className="mt-4 text-gray-600 text-center">Redirigiendo, por favor espere...</p>
-      </div>  
+      </div>
     )
   }
 
@@ -124,7 +146,7 @@ export default function SolicitudIncapacidadesForm() {
     <div className="max-w-3xl mx-auto">
       <div className="mb-6 flex items-center">
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push("/solicitudes")}
           className="mr-4 p-2 rounded-full hover:bg-gray-100"
           aria-label="Volver"
         >
@@ -134,60 +156,62 @@ export default function SolicitudIncapacidadesForm() {
       </div>
 
       <SolicitudFormBase title="Solicitud de permiso por retardo" onSubmit={handleSubmit}>
-          <h2 className="text-center">Complete el formulario para justificar un retardo.</h2>
-          <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6">
-            <h3 className="text-lg font-semibold">Datos del solicitante</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="fecha_solicitud">Fecha de solicitud</Label>
-                <Input id="fecha_solicitud" name="fecha_solicitud" type="date" readOnly value={fechaActual} />
-              </div>
-
-              <div className="space-y-1">
-                <Label>Nombre completo</Label>
-                <Input readOnly value={perfil?.nombre || ""} />
-              </div>
-
-              <div className="space-y-1">
-                <Label>Departamento</Label>
-                <Input readOnly value={perfil?.departamento || ""} />
-              </div>
-
-              <div className="space-y-1">
-                <Label>Puesto</Label>
-                <Input readOnly value={perfil?.puesto || ""} />
-              </div>
-            </div>
-          </div>
-
-          {/* Resto del formulario */}
-          <div className="space-y-2">
-            <Label htmlFor="fecha_retardo">Fecha del retardo</Label>
-            <Input id="fecha_retardo" name="fecha_retardo" type="date" defaultValue="2025-05-10" required />
-          </div>
+        <h2 className="text-center">Complete el formulario para levantar la solicitud.</h2>
+        <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6">
+          <h3 className="text-center text-lg font-semibold">Datos del solicitante</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="hora_establecida">Hora establecida de entrada</Label>
-              <Input id="hora_establecida" name="hora_establecida" type="time" defaultValue="08:00" required />
+            <div className="space-y-1">
+              <Label htmlFor="fecha_solicitud">Fecha de solicitud</Label>
+              <Input id="fecha_solicitud" name="fecha_solicitud" type="date" readOnly value={fechaActual} className= "cursor-not-allowed"/>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="hora_llegada">Hora de llegada</Label>
-              <Input id="hora_llegada" name="hora_llegada" type="time" defaultValue="08:25" required />
+            <div className="space-y-1">
+              <Label>Nombre completo</Label>
+              <Input readOnly value={perfil?.nombre || ""} className= "cursor-not-allowed"/>
             </div>
+
+            <div className="space-y-1">
+              <Label>Departamento</Label>
+              <Input readOnly value={perfil?.departamento || ""} className="cursor-not-allowed"/>
+            </div>
+
+            <div className="space-y-1">
+              <Label>Puesto</Label>
+              <Input readOnly value={perfil?.puesto || ""} className="cursor-not-allowed"/>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="hora_establecida">Hora establecida de entrada laboral</Label>
+            <Input
+              id="hora_establecida"
+              name="hora_establecida"
+              type="time"
+              defaultValue={perfil?.hora_entrada || ""}
+              required
+              readOnly
+              className="hover:cursor-not-allowed"
+            />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="motivo">Motivo del retardo</Label>
-            <Textarea
-              id="motivo"
-              name="motivo"
-              placeholder="Describe el motivo de tu retardo..."
-            />
+            <Label htmlFor="hora_llegada">Hora de llegada</Label>
+            <Input id="hora_llegada" name="hora_llegada" type="time" required />
           </div>
-        </SolicitudFormBase>
-      </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="motivo">Motivo del retardo</Label>
+          <Textarea
+            id="motivo"
+            name="motivo"
+            placeholder="Explique detalladamente el motivo de su retardo..."
+          />
+        </div>
+      </SolicitudFormBase>
+    </div>
   )
 }

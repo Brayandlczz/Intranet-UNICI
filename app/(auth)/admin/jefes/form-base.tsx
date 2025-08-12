@@ -18,7 +18,7 @@ export function SolicitudFormBase({
   title,
   children,
   onSubmit,
-  submitButtonText = "Enviar solicitud",
+  submitButtonText = "Registrar",
 }: SolicitudBaseProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 

@@ -63,18 +63,18 @@ export default function DirectorioPage() {
     cargarEmpleados()
   }, [supabase])
 
-  if (loading) {
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-        <Mosaic color="#2464ec" size="medium" />
-        <p className="text-gray-600 mt-4">Cargando directorio de empleados...</p>
-      </div>
-    )
-  }
+if (loading) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen overflow-hidden">
+      <Mosaic color="#2464ec" size="medium" />
+      <p className="mt-4 text-gray-600 text-lg font-semibold">Cargando empleados...</p>
+    </div>
+  );
+}
 
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">Directorio de Personal</h1>
+      <h1 className="text-center text-2xl font-bold mb-6">Directorio de Personal</h1>
 
       {error ? (
         <div className="bg-red-50 border border-red-200 p-4 rounded-md">

@@ -137,10 +137,10 @@ const handleSubmit = async (formData: any): Promise<{ success: boolean; message:
         <h1 className="text-xl font-semibold">Volver</h1>
       </div>
 
-      <SolicitudFormBase title="Registro de jefes directos por área." onSubmit={handleSubmit}>
+      <SolicitudFormBase title="Registro de jefes/encargados por área." onSubmit={handleSubmit}>
         <h2 className="text-center">Complete el formulario para dar de alta a jefes directos.</h2>
         <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6 cursor-not-allowed">
-          <h3 className="text-lg font-semibold">Datos del encargado a registro:</h3>
+          <h3 className="text-lg font-semibold">Datos del encargado registrante:</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
@@ -166,7 +166,7 @@ const handleSubmit = async (formData: any): Promise<{ success: boolean; message:
         </div>
 
         <div className="space-y-4">
-          <Label htmlFor="id_empleado">Seleccione el jefe directo:</Label>
+          <Label htmlFor="id_empleado">Seleccione un usuario del listado para designarlo como jefe:</Label>
           <select
             id="id_empleado"
             name="id_empleado"

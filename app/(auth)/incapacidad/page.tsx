@@ -126,7 +126,7 @@ export default function SolicitudIncapacidadesForm() {
     <div className="max-w-3xl mx-auto">
       <div className="mb-6 flex items-center">
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push("/solicitudes")}
           className="mr-4 p-2 rounded-full hover:bg-gray-100"
           aria-label="Volver"
         >
@@ -187,7 +187,7 @@ export default function SolicitudIncapacidadesForm() {
 
         <div className="space-y-2">
           <Label htmlFor="diagnostico">Diagnóstico</Label>
-          <Textarea id="diagnostico" name="diagnostico" placeholder="Describa el diagnóstico médico..." />
+          <Textarea id="diagnostico" name="diagnostico" placeholder="Describa el diagnóstico proporcionado por el médico..." />
         </div>
       </SolicitudFormBase>
     </div>

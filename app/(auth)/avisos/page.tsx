@@ -20,7 +20,7 @@ export default async function AvisosPage() {
 
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">Avisos y Comunicados</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Avisos y Comunicados</h1>
 
       {!avisos || avisos.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm p-6 text-center">

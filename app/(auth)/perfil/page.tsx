@@ -5,14 +5,12 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { User, Pencil, Save, X, Upload, Loader2, AlertTriangle } from "lucide-react"
-import { useRouter } from "next/navigation"
 
 type Profile = {
   id: string
   email?: string
   nombre?: string
   role?: string
-  nacionalidad?: string
   lugar_nacimiento?: string
   rfc?: string
   imss?: string
@@ -52,18 +50,15 @@ export default function PerfilPage() {
   const [usingSampleData, setUsingSampleData] = useState(false)
   const supabase = createClientComponentClient()
 
-  // Función para añadir información de depuración
   const addDebugInfo = (info: string) => {
     setDebugInfo((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${info}`])
     console.log(info)
   }
 
-  // Función para crear un perfil en Supabase
   const createProfile = async (userId: string) => {
     try {
       addDebugInfo(`Intentando crear perfil para usuario: ${userId}`)
 
-      // Crear un perfil con datos mínimos
       const newProfile = {
         id: userId,
       }
@@ -82,7 +77,6 @@ export default function PerfilPage() {
     }
   }
 
-  // Función para obtener la sesión actual
   const getSession = async () => {
     try {
       const { data, error } = await supabase.auth.getSession()
@@ -105,13 +99,11 @@ export default function PerfilPage() {
     }
   }
 
-  // Función para cargar el perfil
   const fetchProfile = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      // Obtener la sesión actual
       const session = await getSession()
 
       if (!session) {
@@ -123,13 +115,11 @@ export default function PerfilPage() {
       const userId = session.user.id
       addDebugInfo(`Intentando cargar perfil para usuario: ${userId}`)
 
-      // Intentar obtener el perfil
       const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single()
 
       if (error) {
         addDebugInfo(`Error al cargar perfil: ${error.message}`)
 
-        // Intentar crear un perfil si no existe
         try {
           const newProfile = await createProfile(userId)
           setProfile(newProfile)
@@ -157,18 +147,15 @@ export default function PerfilPage() {
     }
   }
 
-  // Cargar el perfil cuando el componente se monte
   useEffect(() => {
     fetchProfile()
   }, [])
 
-  // Cargar todos los perfiles para el campo jefe_directo
   useEffect(() => {
     console.log("🔄 Iniciando fetch de jefes directos...")
 
     const fetchProfiles = async () => {
       try {
-        // Asegúrate que esta tabla y relaciones existen en tu BD
         const { data, error } = await supabase
           .from("jefes_directos")
           .select("id, id_empleado (id, nombre)")
@@ -227,14 +214,12 @@ export default function PerfilPage() {
       setSuccess(null)
 
       if (usingSampleData) {
-        // Si estamos usando datos de ejemplo, solo simular la actualización
         setProfile(formData)
         setSuccess("Perfil actualizado correctamente (modo simulación)")
         setEditing(false)
         return
       }
 
-      // Obtener la sesión actual
       const session = await getSession()
 
       if (!session) {
@@ -260,7 +245,6 @@ export default function PerfilPage() {
     setError(null)
   }
 
-  // Avatar upload handler
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !profile) return
@@ -277,11 +261,9 @@ export default function PerfilPage() {
         return
       }
 
-      // Obtener la sesión actual
       const session = await getSession()
       if (!session) throw new Error("No hay sesión activa")
 
-      // Crear un nombre de archivo único
       const fileExt = file.name.split(".").pop()
       const fileName = `${profile.id}/${file.name}`
       const filePath = fileName
@@ -344,7 +326,6 @@ export default function PerfilPage() {
     fetchSignedUrl()
   }, [profile?.foto_url])
 
-  // Mostrar estado de carga
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-20">
@@ -353,7 +334,6 @@ export default function PerfilPage() {
       </div>
     )
   }
-  // Si tenemos un perfil (real o de ejemplo), mostrar la interfaz
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Mi Perfil</h1>
@@ -373,7 +353,6 @@ export default function PerfilPage() {
         <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">{success}</div>
       )}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        {/* Cabecera con foto de perfil */}
         <div className="relative bg-gradient-to-r from-blue-600 to-blue-700 h-40">
           <div className="absolute -bottom-16 left-8">
             <div className="relative">
@@ -381,7 +360,6 @@ export default function PerfilPage() {
                 {profile?.foto_url ? (
                   <img
                     src={avatarUrl || "/placeholder.svg"}
-                    //alt={profile.nombre || "Avatar"} comentado por deshuso
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
@@ -433,10 +411,8 @@ export default function PerfilPage() {
           )}
         </div>
 
-        {/* Contenido del perfil */}
         <div className="pt-20 px-8 pb-8">
           {!editing ? (
-            // Modo visualización
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">
@@ -446,7 +422,6 @@ export default function PerfilPage() {
                 <p className="text-gray-500">{profile?.departamento}</p>
               </div>
 
-              {/* Tabs de navegación */}
               <div className="border-b border-gray-200">
                 <nav className="flex space-x-8">
                   <button
@@ -482,7 +457,6 @@ export default function PerfilPage() {
                 </nav>
               </div>
 
-              {/* Contenido de las tabs */}
               <div className="pt-4">
                 {activeTab === "personal" && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -509,11 +483,9 @@ export default function PerfilPage() {
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-bold text-gray-800 mb-3">Nacionalidad y origen</h3>
+                      <h3 className="text-sm font-bold text-gray-800 mb-3">Datos de Identidad y Origen</h3>
                       <div className="space-y-3">
                         <div>
-                          <p className="text-sm text-gray-500">Nacionalidad</p>
-                          <p>{profile?.nacionalidad || "No especificada"}</p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">Lugar de nacimiento</p>
@@ -633,9 +605,7 @@ export default function PerfilPage() {
               </div>
             </div>
           ) : (
-            // Modo edición
             <form className="space-y-6">
-              {/* Tabs de navegación para edición */}
               <div className="border-b border-gray-200">
                 <nav className="flex space-x-8">
                   <button
@@ -674,7 +644,6 @@ export default function PerfilPage() {
                 </nav>
               </div>
 
-              {/* Contenido de las tabs en modo edición */}
               <div className="pt-4">
                 {activeTab === "personal" && (
                   <>
@@ -749,19 +718,6 @@ export default function PerfilPage() {
                           <option value="Unión libre">Unión libre</option>
                         </select>
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Nacionalidad</label>
-                        <input
-                          type="text"
-                          name="nacionalidad"
-                          value={formData?.nacionalidad || ""}
-                          onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                    </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Lugar de nacimiento</label>
                       <input
@@ -771,6 +727,7 @@ export default function PerfilPage() {
                         onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -932,7 +889,6 @@ export default function PerfilPage() {
                       </div>
                     </div>
 
-                    {/*div jefe directo*/}
                     <div>
                       <label htmlFor="jefe_directo" className="block text-sm font-medium text-gray-700 mb-1">
                         Jefe directo

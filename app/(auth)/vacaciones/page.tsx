@@ -29,7 +29,7 @@ return (
   <div className="p-6 space-y-6">
     <div className="flex items-center">
       <button
-        onClick={() => router.back()}
+        onClick={() => router.push("/solicitudes")}
         className="mr-2 p-2 rounded-full hover:bg-gray-100"
         aria-label="Volver"
       >

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useEffect, useState } from "react"
-import { LayoutDashboard, User, Calendar, BookOpen, Bell, LogOut, Menu, X,  FileText, FilePen, Megaphone, Users, Cake, Sunset, Handshake } from "lucide-react"
+import { LayoutDashboard, User, Calendar, BookOpen, Bell, LogOut, Menu, X,  FileText, FilePen, Megaphone, Users, Cake, Sunset, Handshake, HandHeart, MailCheck, MailboxIcon, PenLine } from "lucide-react"
 
 type Profile = {
   id: string
@@ -81,14 +81,12 @@ useEffect(() => {
     setIsOpen(!isOpen)
   }
 
-  // Cerrar el sidebar en móvil cuando se navega a una nueva página
   useEffect(() => {
     setIsOpen(false)
   }, [pathname])
 
   return (
     <>
-      {/* Botón de menú móvil */}
       <button
         onClick={toggleSidebar}
         className="fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md md:hidden"
@@ -96,21 +94,17 @@ useEffect(() => {
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* Overlay para móvil */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
         <div className="flex flex-col h-full">
-          {/* Logo y título */}
           <div className="p-4 border-b justify-center">
           <img src="logounici.webp" alt="Logo UNICI" className="h-16 mx-auto" />
           </div>
-          {/* Perfil de usuario */}
           {profile && (
             <div className="flex items-center gap-3 p-4 border-b">
               <Link href="/perfil">
@@ -133,7 +127,6 @@ useEffect(() => {
             </div>
           )}
 
-          {/* Navegación */}
           <nav className="flex-1 overflow-auto p-4">
             <ul className="space-y-2">
               <li>
@@ -176,6 +169,22 @@ useEffect(() => {
                   <span>Directorio</span>
                 </Link>
               </li>
+
+              <li>
+                <Link
+                  href="/e-firma"
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
+                    isActive("/e-firma")
+                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
+                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
+                  }`}
+                  onClick={() => console.log("Navegando a directorio")}
+                >
+                  <PenLine size={20} />
+                  <span>Firma electrónica</span>
+                </Link>
+              </li>
+
               <li>
                 <Link
                   href="/#"
@@ -231,9 +240,23 @@ useEffect(() => {
                  <span>Documentos</span>
                  </Link>
               </li>
+
+               <li>
+                <Link
+                  href="/blog"
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
+                    isActive("/blog")
+                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
+                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
+                  }`}
+                >
+                 <HandHeart size={20} />
+                 <span>Blog UNICI</span>
+                 </Link>
+              </li>
             </ul>
           </nav>
-{/* Sección visible solo para Admin */}
+
 {profile?.roles?.nombre === "admin" && (
   <div className="p-4 border-t">
     <button
@@ -275,7 +298,8 @@ useEffect(() => {
           <span>Gestión de Documentos</span>
         </Link>
       </li>
-            <li>
+
+      <li>
         <Link
           href="/admin/users"
           className={`flex items-center gap-3 p-2 rounded-md transition-all ${
@@ -288,7 +312,22 @@ useEffect(() => {
           <span>Gestión de Usuarios</span>
         </Link>
       </li>
-            <li>
+
+      <li>
+        <Link
+          href="/admin/publicador"
+          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
+            isActive("/admin/publicador")
+              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
+              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
+          }`}
+        >
+          <MailboxIcon size={20} />
+          <span>Gestión de publicaciones</span>
+        </Link>
+      </li>
+
+      <li>
         <Link
           href="#"
           className={`flex items-center gap-3 p-2 rounded-md transition-all ${
@@ -301,7 +340,8 @@ useEffect(() => {
           <span>Tarjetas de Cumpleaños</span>
         </Link>
       </li>
-            <li>
+
+      <li>
         <Link
           href="/admin/set-vacations"
           className={`flex items-center gap-3 p-2 rounded-md transition-all ${
@@ -328,7 +368,6 @@ useEffect(() => {
     </ul>
   </div>
 )}
-          {/* Cerrar sesión */}
           <div className="p-4 border-t">
             <button
               onClick={handleSignOut}
