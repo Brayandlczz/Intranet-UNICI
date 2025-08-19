@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
 
@@ -32,6 +33,7 @@ const users = [
 
 const UserManagementView: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState("Todos los roles");
+  const router= useRouter();
   const [search, setSearch] = useState("");
 
   const filteredUsers = users.filter(
@@ -45,7 +47,12 @@ const UserManagementView: React.FC = () => {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">Gestión de Usuarios</h2>
-        <Button className="bg-blue-600 text-white">+ Agregar Usuario</Button>
+          <Button
+            className="bg-blue-600 text-white"
+            onClick={() => router.push("/admin/users/register")}
+          >
+            + Agregar usuario
+          </Button>
       </div>
 
       <div className="bg-white p-4 rounded shadow">

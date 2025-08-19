@@ -17,7 +17,6 @@ export default function DiagnosticoSesion() {
     console.log(message)
   }
 
-  // Función para decodificar un JWT sin necesidad de bibliotecas externas
   const decodeJWT = (token: string) => {
     try {
       const base64Url = token.split(".")[1]
@@ -34,7 +33,6 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Función para verificar la sesión usando el método getSession
   const checkSessionWithGetSession = async () => {
     try {
       addLog("Verificando sesión con supabase.auth.getSession()...")
@@ -55,7 +53,6 @@ export default function DiagnosticoSesion() {
       addLog(`🆔 User ID: ${data.session.user.id}`)
       addLog(`⏱️ Expira: ${new Date(data.session.expires_at! * 1000).toLocaleString()}`)
 
-      // Verificar si la sesión está próxima a expirar
       const expiresAt = data.session.expires_at! * 1000
       const now = Date.now()
       const timeLeft = expiresAt - now
@@ -73,7 +70,6 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Función para verificar la sesión usando el método getUser
   const checkSessionWithGetUser = async () => {
     try {
       addLog("Verificando usuario con supabase.auth.getUser()...")
@@ -100,7 +96,6 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Función para verificar las cookies
   const checkCookies = () => {
     try {
       addLog("Verificando cookies del navegador...")
@@ -111,7 +106,6 @@ export default function DiagnosticoSesion() {
         return []
       }
 
-      // Buscar cookies relacionadas con Supabase
       const supabaseCookies = cookies.filter(
         (cookie) =>
           cookie.startsWith("sb-") ||
@@ -125,7 +119,6 @@ export default function DiagnosticoSesion() {
       } else {
         addLog(`✅ Se encontraron ${supabaseCookies.length} cookies relacionadas con Supabase`)
 
-        // Verificar cookies específicas
         const hasAccessToken = supabaseCookies.some((c) => c.includes("access_token"))
         const hasRefreshToken = supabaseCookies.some((c) => c.includes("refresh_token"))
 
@@ -149,12 +142,10 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Función para verificar el JWT
   const checkJWT = async () => {
     try {
       addLog("Verificando JWT...")
 
-      // Intentar obtener el JWT de la sesión
       const { data, error } = await supabase.auth.getSession()
 
       if (error || !data.session) {
@@ -172,7 +163,6 @@ export default function DiagnosticoSesion() {
 
       addLog("✅ JWT decodificado correctamente")
 
-      // Verificar campos importantes del JWT
       if (decodedJWT.exp) {
         const expiresAt = decodedJWT.exp * 1000
         const now = Date.now()
@@ -202,18 +192,15 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Función para probar una solicitud a la API de Supabase
   const testSupabaseAPI = async () => {
     try {
       addLog("Probando conexión a la API de Supabase...")
 
-      // Intentar una consulta simple
       const { data, error } = await supabase.from("profiles").select("count()").limit(1)
 
       if (error) {
         addLog(`❌ Error al conectar con la API de Supabase: ${error.message}`)
 
-        // Verificar si es un error de autenticación
         if (error.code === "401" || error.message.includes("JWT")) {
           addLog("⚠️ Error de autenticación. Posible problema con el token JWT.")
         }
@@ -229,29 +216,23 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Función para ejecutar todos los diagnósticos
   const runAllDiagnostics = async () => {
     try {
       setIsLoading(true)
       setLogs([])
       addLog("Iniciando diagnóstico completo de sesión...")
 
-      // Verificar sesión con getSession
       const session = await checkSessionWithGetSession()
       setSessionData(session)
 
-      // Verificar usuario con getUser
       await checkSessionWithGetUser()
 
-      // Verificar cookies
       const cookies = checkCookies()
       setCookiesData(cookies)
 
-      // Verificar JWT
       const jwt = await checkJWT()
       setJwtData(jwt)
 
-      // Probar API de Supabase
       await testSupabaseAPI()
 
       addLog("Diagnóstico completo finalizado.")
@@ -262,17 +243,14 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Ejecutar diagnóstico al cargar el componente
   useEffect(() => {
     runAllDiagnostics()
   }, [])
 
-  // Función para intentar renovar la sesión
   const handleRenewSession = async () => {
     try {
       addLog("Intentando renovar la sesión...")
 
-      // Intentar renovar la sesión
       const { data, error } = await supabase.auth.refreshSession()
 
       if (error) {
@@ -288,7 +266,6 @@ export default function DiagnosticoSesion() {
       addLog("✅ Sesión renovada correctamente")
       setSessionData(data.session)
 
-      // Ejecutar diagnóstico nuevamente
       setTimeout(() => {
         runAllDiagnostics()
       }, 1000)
@@ -297,12 +274,10 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Función para iniciar sesión de prueba
   const handleTestLogin = async () => {
     try {
       addLog("Iniciando sesión de prueba...")
 
-      // Mostrar formulario de inicio de sesión
       const email = prompt("Ingresa tu email:")
       if (!email) {
         addLog("❌ Inicio de sesión cancelado (no se proporcionó email)")
@@ -315,7 +290,6 @@ export default function DiagnosticoSesion() {
         return
       }
 
-      // Intentar iniciar sesión
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -334,7 +308,6 @@ export default function DiagnosticoSesion() {
       addLog("✅ Sesión iniciada correctamente")
       setSessionData(data.session)
 
-      // Ejecutar diagnóstico nuevamente
       setTimeout(() => {
         runAllDiagnostics()
       }, 1000)
@@ -343,12 +316,10 @@ export default function DiagnosticoSesion() {
     }
   }
 
-  // Función para cerrar sesión
   const handleLogout = async () => {
     try {
       addLog("Cerrando sesión...")
 
-      // Cerrar sesión
       const { error } = await supabase.auth.signOut()
 
       if (error) {
@@ -359,7 +330,6 @@ export default function DiagnosticoSesion() {
       addLog("✅ Sesión cerrada correctamente")
       setSessionData(null)
 
-      // Ejecutar diagnóstico nuevamente
       setTimeout(() => {
         runAllDiagnostics()
       }, 1000)

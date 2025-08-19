@@ -14,7 +14,6 @@ import { useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 
-// Definimos un tipo para el nuevo aviso
 interface Announcement {
   titulo: string
   descripcion: string
@@ -23,7 +22,7 @@ interface Announcement {
 
 export default function AdminAnnouncementsPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [announcements, setAnnouncements] = useState<any[]>([]) // Usar "any" hasta que tengamos una mejor definición del tipo de datos
+  const [announcements, setAnnouncements] = useState<any[]>([])
   const [newAnnouncement, setNewAnnouncement] = useState<Announcement>({
     titulo: "",
     descripcion: "",
@@ -164,7 +163,7 @@ export default function AdminAnnouncementsPage() {
     <div className="container mx-auto py-4">
       <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 space-y-6">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-          <h1 className="text-2xl font-bold">Gestión de Avisos y Comunicados</h1>
+          <h1 className="text-center text-1x1 font-bold text-nowrap">Gestión de Avisos y Comunicados</h1> 
           <Button
             onClick={() => router.push("/admin/avisos/nuevo")}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"

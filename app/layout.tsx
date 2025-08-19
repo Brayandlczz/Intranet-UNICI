@@ -2,7 +2,6 @@ import { Inter } from "next/font/google"
 import type React from "react"
 import "./globals.css"
 
-// Configurar la fuente Inter
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",

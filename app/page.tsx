@@ -44,16 +44,14 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-5xl flex flex-col md:flex-row transition-all duration-300">
         
-        {/* Panel izquierdo con branding */}
         <div className="bg-blue-700 text-white p-10 md:w-1/2 flex flex-col justify-center items-center">
           <img src="/logo-blanco.png" alt="Logo UNICI" className="w-36 h-auto mb-6 drop-shadow-lg" />
-          <h1 className="text-4xl font-extrabold mb-3 text-center tracking-wide">PORTAL UNICI</h1>
+          <h1 className="text-3xl font-extrabold mb-3 text-center tracking-wide">PORTAL UNICI</h1>
           <p className="text-blue-100 text-lg text-center leading-relaxed">
             Gestión integral de Recursos Humanos y comunicación interna.
           </p>
         </div>
 
-        {/* Panel derecho con login */}
         <div className="p-10 md:w-1/2 flex flex-col justify-center bg-white">
           <h2 className="text-3xl text-center font-bold text-gray-800 mb-2">Intranet UNICI</h2>
           <p className="text-center text-gray-600 mb-6">Accede con tus credenciales institucionales</p>

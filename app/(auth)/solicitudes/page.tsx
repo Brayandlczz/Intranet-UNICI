@@ -1,10 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { CalendarDays, Clock, Cake, HeartPulse, TreePalm, Plane } from "lucide-react";
+import { Mosaic } from "react-loading-indicators";
 
 export default function GestorSolicitudes() {
+  const [loading, setLoading] = useState(true);
+
   const solicitudes = [
     {
       titulo: "Solicitud de Permiso",
@@ -34,15 +37,29 @@ export default function GestorSolicitudes() {
       titulo: "Solicitud de vacaciones",
       descripcion: "Solicita un periodo vacacional utilizando tus días disponibles.",
       ruta: "/vacaciones",
-      icono : <TreePalm className="h-6 w-6 text-blue-600"/>,
+      icono: <TreePalm className="h-6 w-6 text-blue-600" />,
     },
     {
       titulo: "Solicitud de viáticos",
       descripcion: "Solicita viáticos para cubrir gastos relacionados con actividades laborales autorizadas.",
       ruta: "/vacaciones",
-      icono : <Plane className="h-6 w-6 text-blue-600"/>,
+      icono: <Plane className="h-6 w-6 text-blue-600" />,
     },
   ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800); 
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Mosaic color="#2464ec" size="medium" />
+        <p className="mt-4 text-gray-600 text-lg font-semibold">Cargando solicitudes...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-6">
@@ -59,15 +76,13 @@ export default function GestorSolicitudes() {
             key={index}
             className="bg-white border border-gray-200 rounded-lg shadow-sm p-5 flex flex-col justify-between"
           >
-      <div className="relative flex items-center w-full mb-3">
-        <h2 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-lg font-semibold text-gray-800">
-          {solicitud.titulo}
-        </h2>
-        <span className="ml-auto">{solicitud.icono}</span>
-      </div>
-            <p className="text-gray-500 text-sm mb-6 text-center">
-              {solicitud.descripcion}
-            </p>
+            <div className="relative flex items-center w-full mb-3">
+              <h2 className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-lg font-semibold text-gray-800">
+                {solicitud.titulo}
+              </h2>
+              <span className="ml-auto">{solicitud.icono}</span>
+            </div>
+            <p className="text-gray-500 text-sm mb-6 text-center">{solicitud.descripcion}</p>
 
             <Link
               href={solicitud.ruta}

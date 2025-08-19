@@ -30,7 +30,6 @@ export default function LoginPage() {
         throw error
       }
 
-      // Redirigir al dashboard después del login exitoso
       router.push("/dashboard")
       router.refresh()
     } catch (error: any) {

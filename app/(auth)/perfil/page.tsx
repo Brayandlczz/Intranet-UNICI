@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { Mosaic } from "react-loading-indicators"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { User, Pencil, Save, X, Upload, Loader2, AlertTriangle } from "lucide-react"
 
@@ -329,14 +330,15 @@ export default function PerfilPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-20">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
-        <p className="text-gray-600">Cargando información del perfil...</p>
+        <Mosaic color="#2464ec" size="large" />
+        <p className="mt-4 text-gray-600">Cargando perfil del usuario...</p>
       </div>
     )
   }
+
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Mi Perfil</h1>
+      <h1 className="text-center text-2xl font-bold mb-6">Mi Perfil</h1>
 
       {usingSampleData && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">

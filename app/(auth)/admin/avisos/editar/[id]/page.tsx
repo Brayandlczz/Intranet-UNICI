@@ -15,10 +15,8 @@ const [loading, setLoading] = useState(true)
 const [error, setError] = useState<string | null>(null)
 const supabase = createClientComponentClient()
 
-// Obtener el ID del aviso de los parámetros de la URL
 const id = params.id as string
 
-// Cargar los datos del aviso cuando se monte el componente
 useEffect(() => {
   async function cargarAviso() {
     if (!id) return
@@ -27,7 +25,6 @@ useEffect(() => {
       setLoading(true)
       setError(null)
 
-      // Consultar el aviso por su ID
       const { data, error } = await supabase
         .from("avisos")
         .select(`
@@ -57,7 +54,6 @@ useEffect(() => {
   cargarAviso()
 }, [id, supabase])
 
-// Mostrar estado de carga
 if (loading) {
   return (
     <div className="container mx-auto py-6 flex flex-col items-center justify-center min-h-[50vh]">
@@ -67,7 +63,6 @@ if (loading) {
   )
 }
 
-// Mostrar mensaje de error si ocurrió algún problema
 if (error) {
   return (
     <div className="container mx-auto py-6">
@@ -82,7 +77,6 @@ if (error) {
   )
 }
 
-// Renderizar el formulario de edición con los datos del aviso
 return (
   <div className="container mx-auto py-6">
     <h1 className="text-2xl font-bold mb-6">Editar Aviso</h1>

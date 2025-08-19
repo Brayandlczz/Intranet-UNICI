@@ -23,7 +23,6 @@ export default function DiagnosticoAuth() {
       setLogs([])
       addLog("Iniciando diagnóstico de autenticación...")
 
-      // 1. Verificar si hay una sesión activa
       addLog("Verificando sesión de usuario...")
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
 
@@ -43,7 +42,6 @@ export default function DiagnosticoAuth() {
       addLog(`✅ Sesión activa encontrada para el usuario: ${currentUser.id}`)
       addLog(`📧 Email del usuario: ${currentUser.email}`)
 
-      // 2. Verificar si el usuario tiene un perfil en la tabla profiles
       addLog(`Buscando perfil para el usuario ${currentUser.id}...`)
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
@@ -58,7 +56,6 @@ export default function DiagnosticoAuth() {
           addLog(`❌ Error al buscar el perfil: ${profileError.message}`)
         }
 
-        // 3. Verificar permisos RLS
         addLog("Verificando políticas RLS en la tabla profiles...")
         const { data: rlsTestData, error: rlsTestError } = await supabase.from("profiles").select("count()").limit(1)
 
@@ -69,7 +66,6 @@ export default function DiagnosticoAuth() {
           addLog("✅ Las políticas RLS permiten leer la tabla profiles.")
         }
 
-        // 4. Verificar si hay otros perfiles en la tabla
         addLog("Verificando si existen otros perfiles en la tabla...")
         const { data: allProfiles, error: allProfilesError } = await supabase.from("profiles").select("id").limit(5)
 
@@ -131,7 +127,6 @@ export default function DiagnosticoAuth() {
       addLog("✅ Perfil creado exitosamente!")
       setProfileData(newProfile)
 
-      // Recargar diagnóstico
       setTimeout(() => {
         runDiagnostic()
       }, 1000)
@@ -148,7 +143,6 @@ export default function DiagnosticoAuth() {
       setUserId(null)
       setProfileData(null)
 
-      // Recargar la página después de un breve retraso
       setTimeout(() => {
         window.location.href = "/"
       }, 1500)

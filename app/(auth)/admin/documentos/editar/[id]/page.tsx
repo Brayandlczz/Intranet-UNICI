@@ -1,4 +1,3 @@
-// app/(auth)/admin/documentos/editar/[id]/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -46,7 +45,6 @@ export default function EditarDocumentoPage() {
         if (error) throw error
         if (!data) throw new Error("No se encontró el documento")
 
-        // Si es personal, obtener empleados
         if (data.tipo === 'personal') {
           const { data: empleadosData, error: empleadosError } = await supabase
             .from("documentos_empleados")

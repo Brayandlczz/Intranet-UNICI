@@ -111,6 +111,15 @@ const handleSubmit = async (formData: any) => {
     }
   }
 
+  if(loading){
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <Mosaic color="#2464ec" size="medium" />
+          <p className="mt-4 text-gray-600 text-center">Cargando datos del solicitante...</p>
+      </div>
+    )
+  }
+
   if (isSubmitting) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">

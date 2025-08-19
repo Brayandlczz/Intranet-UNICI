@@ -24,12 +24,11 @@ export function SolicitudIncapacidadesForm() {
   const [isUploading, setIsUploading] = useState(false)
   const supabase = createClientComponentClient()
 
-  // Calcular días entre fechas
   const calcularDias = () => {
     if (fechaInicio && fechaFin) {
       const inicio = parseISO(fechaInicio)
       const fin = parseISO(fechaFin)
-      const dias = differenceInCalendarDays(fin, inicio) + 1 // +1 para incluir el día final
+      const dias = differenceInCalendarDays(fin, inicio) + 1 
       setDiasCalculados(dias > 0 ? dias : 0)
     } else {
       setDiasCalculados(null)
@@ -50,7 +49,6 @@ export function SolicitudIncapacidadesForm() {
 
       if (uploadError) throw uploadError
 
-      // Obtener URL pública
       const {
         data: { publicUrl },
       } = supabase.storage.from("documentos").getPublicUrl(filePath)

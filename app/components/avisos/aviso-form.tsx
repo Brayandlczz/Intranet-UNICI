@@ -1,4 +1,3 @@
-// app/components/avisos/aviso-form.tsx
 "use client"
 
 import type React from "react"
@@ -41,9 +40,7 @@ export function AvisoForm({ aviso, isEditing = false }: AvisoFormProps) {
     }
   }
 
-  // Función para manejar la redirección
   const handleRedirect = () => {
-    // Usar window.location para forzar una redirección completa
     window.location.href = "/admin/avisos"
   }
 
@@ -73,9 +70,7 @@ export function AvisoForm({ aviso, isEditing = false }: AvisoFormProps) {
       if (result.success) {
         setSuccess(`${result.message} Redirigiendo...`)
 
-        // Usar setTimeout para dar tiempo a que se muestre el mensaje
         setTimeout(() => {
-          // Usar router.push con opciones de revalidación
           router.push("/admin/avisos")
           
         }, 1500)
@@ -86,7 +81,7 @@ export function AvisoForm({ aviso, isEditing = false }: AvisoFormProps) {
       console.error("Error al guardar aviso:", err)
       setError(typeof err.message === "string" ? err.message : "Error al guardar el aviso")
     } finally {
-      // No desactivamos isSubmitting para mantener los botones deshabilitados durante la redirección
+     
     }
   }
 

@@ -4,7 +4,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useEffect, useState } from "react"
-import { LayoutDashboard, User, Calendar, BookOpen, Bell, LogOut, Menu, X,  FileText, FilePen, Megaphone, Users, Cake, Sunset, Handshake, HandHeart, MailCheck, MailboxIcon, PenLine } from "lucide-react"
+import { 
+  LayoutDashboard, User, Calendar, BookOpen, Bell, LogOut, Menu, X, 
+  FileText, FilePen, Megaphone, Users, Cake, Sunset, Handshake, HandHeart, MailboxIcon, PenLine 
+} from "lucide-react"
 
 type Profile = {
   id: string
@@ -20,70 +23,56 @@ export function Sidebar() {
   const pathname = usePathname()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<number>(3) 
   const supabase = createClientComponentClient()
 
-useEffect(() => {
-  const fetchProfile = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
 
-    if (user) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*, roles(nombre)")
-        .eq("id", user.id)
-        .single()
+      if (user) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*, roles(nombre)")
+          .eq("id", user.id)
+          .single()
 
-      if (error) {
-        console.error("Error al obtener el perfil:", error)
-        return
-      }
-
-      if (data) {
-        let signedUrl = null
-
-        if (data.foto_url) {
-          const { data: signedData, error: signedError } = await supabase.storage
-            .from("archivos-intra")
-            .createSignedUrl(data.foto_url, 43200)
-
-          if (signedError) {
-            console.warn("Error al generar URL firmada:", signedError)
-          } else {
-            signedUrl = signedData?.signedUrl
-          }
+        if (error) {
+          console.error("Error al obtener el perfil:", error)
+          return
         }
 
-        setProfile({
-          ...data,
-          foto_url: signedUrl ?? null
-        })
-      } else {
-        setProfile({ id: user.id })
+        if (data) {
+          let signedUrl = null
+          if (data.foto_url) {
+            const { data: signedData, error: signedError } = await supabase.storage
+              .from("archivos-intra")
+              .createSignedUrl(data.foto_url, 43200)
+            if (!signedError) signedUrl = signedData?.signedUrl
+          }
+
+          setProfile({
+            ...data,
+            foto_url: signedUrl ?? null
+          })
+        } else {
+          setProfile({ id: user.id })
+        }
       }
     }
-  }
 
-  fetchProfile()
-}, [supabase])
+    fetchProfile()
+  }, [supabase])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
+    sessionStorage.removeItem("birthdayMessageShown")
     window.location.href = "/"
   }
 
-  const isActive = (path: string) => {
-    return pathname === path || pathname.startsWith(`${path}/`)
-  }
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen)
-  }
-
-  useEffect(() => {
-    setIsOpen(false)
-  }, [pathname])
+  const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`)
+  const toggleSidebar = () => setIsOpen(!isOpen)
+  useEffect(() => setIsOpen(false), [pathname])
 
   return (
     <>
@@ -94,36 +83,42 @@ useEffect(() => {
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsOpen(false)} />
-      )}
+      {isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsOpen(false)} />}
 
-      <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
-      >
+      <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
         <div className="flex flex-col h-full">
-          <div className="p-4 border-b justify-center">
-          <img src="logounici.webp" alt="Logo UNICI" className="h-16 mx-auto" />
+
+          <div className="p-2 border-b justify-center">
+            <img src="logounici.webp" alt="Logo UNICI" className="h-16 mx-auto" />
           </div>
+
           {profile && (
-            <div className="flex items-center gap-3 p-4 border-b">
-              <Link href="/perfil">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold cursor-pointer overflow-hidden">
-              {profile.foto_url ? (
-                <img src={profile.foto_url} alt="Foto de perfil" className="w-full h-full object-cover" />
-              ) : (
-                <span>
-                  {profile.nombre ? profile.nombre[0] : profile.email?.[0] || "U"}
-                </span>
-              )}
-            </div>
-              </Link>
-              <div className="flex flex-col">
-                <span className="font-medium"> {/*whitespace-nowrap eliminado*/}
-                  {profile.nombre ? `${profile.nombre}` : profile.email || "Usuario"}
-                </span>
-                <span className="text-xs text-gray-500">Rol: {profile.roles?.nombre || "nop"}</span>
+            <div className="flex flex-col p-4 border-b">
+              <div className="flex justify-between items-center">
+                <span className="font-normal font-bold">Notificaciones</span>
+                <button className="relative p-1 text-gray-600 hover:text-gray-800">
+                  <Bell size={16} />
+                  {notifications > 0 && (
+                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                      {notifications}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <Link href="/perfil" className="flex items-center gap-4 mt-1">
+            <div className="w-12 aspect-square rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold cursor-pointer overflow-hidden">
+                  {profile.foto_url ? (
+                    <img src={profile.foto_url} alt="Foto de perfil" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{profile.nombre ? profile.nombre[0] : profile.email?.[0] || "U"}</span>
+                  )}
                 </div>
+                <div className="flex flex-col">
+                  <span className="font-normal truncate max-w-[145px]">{profile.nombre || profile.email || "Usuario"}</span>
+                  <span className="text-xs text-gray-800">Rol: {profile.roles?.nombre || "No asignado"}</span>
+                </div>
+              </Link>
             </div>
           )}
 
@@ -132,11 +127,7 @@ useEffect(() => {
               <li>
                 <Link
                   href="/dashboard"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/dashboard")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/dashboard") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
                   <LayoutDashboard size={20} />
                   <span>Panel principal</span>
@@ -145,11 +136,7 @@ useEffect(() => {
               <li>
                 <Link
                   href="/perfil"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/perfil")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/perfil") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
                   <User size={20} />
                   <span>Mi perfil</span>
@@ -158,216 +145,135 @@ useEffect(() => {
               <li>
                 <Link
                   href="/directorios"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/directorios")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
-                  onClick={() => console.log("Navegando a directorio")}
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/directorios") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
                   <BookOpen size={20} />
                   <span>Directorio</span>
                 </Link>
               </li>
-
               <li>
                 <Link
                   href="/e-firma"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/e-firma")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
-                  onClick={() => console.log("Navegando a directorio")}
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/e-firma") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
                   <PenLine size={20} />
                   <span>Firma electrónica</span>
                 </Link>
               </li>
-
               <li>
                 <Link
-                  href="/#"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/#")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
+                  href="/calendario"
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/calendario") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
                   <Calendar size={20} />
                   <span>Calendario</span>
                 </Link>
               </li>
-
               <li>
                 <Link
                   href="/solicitudes"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/solicitudes")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/solicitudes") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
                   <FilePen size={20} />
                   <span>Solicitudes</span>
                 </Link>
               </li>
-
               <li>
                 <Link
                   href="/avisos"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/avisos")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/avisos") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
                   <Megaphone size={20} />
                   <span>Avisos y comunicados</span>
                 </Link>
               </li>
-
               <li>
                 <Link
                   href="/documentos"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/documentos")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/documentos") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
-                 <FileText size={20} />
-                 <span>Documentos</span>
-                 </Link>
+                  <FileText size={20} />
+                  <span>Documentos</span>
+                </Link>
               </li>
-
-               <li>
+              <li>
                 <Link
                   href="/blog"
-                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-                    isActive("/blog")
-                      ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] transform translate-y-[-1px]"
-                      : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-                  }`}
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/blog") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
                 >
-                 <HandHeart size={20} />
-                 <span>Blog UNICI</span>
-                 </Link>
+                  <HandHeart size={20} />
+                  <span>Blog UNICI</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/registrar"
+                  className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/registrar") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}
+                >
+                  <User size={20} />
+                  <span>Registrar usuario</span>
+                </Link>
               </li>
             </ul>
           </nav>
 
-{profile?.roles?.nombre === "admin" && (
-  <div className="p-4 border-t">
-    <button
-      onClick={() => setAdminOpen((prev) => !prev)}
-      className="flex items-center justify-between w-full text-xs font-medium text-gray-500 mb-2 hover:text-gray-700"
-    >
-      Administración
-      <span>{adminOpen ? "▲" : "▼"}</span>
-    </button>
+          {profile?.roles?.nombre === "admin" && (
+            <div className="p-4 border-t">
+              <button
+                onClick={() => setAdminOpen((prev) => !prev)}
+                className="flex items-center justify-between w-full text-xs font-medium text-gray-500 mb-2 hover:text-gray-700"
+              >
+                Administración
+                <span>{adminOpen ? "▲" : "▼"}</span>
+              </button>
 
-    <ul
-      className={`space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${
-        adminOpen ? "max-h-[500px]" : "max-h-0"
-      }`}
-    >
-      <li>
-        <Link
-          href="/admin/avisos"
-          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-            isActive("/admin/avisos")
-              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
-              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-          }`}
-        >
-          <Bell size={20} />
-          <span>Gestión de Avisos</span>
-        </Link>
-      </li>
-      <li>
-        <Link
-          href="/admin/documentos"
-          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-            isActive("/admin/documentos")
-              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
-              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-          }`}
-        >
-          <FileText size={20} />
-          <span>Gestión de Documentos</span>
-        </Link>
-      </li>
+              <ul className={`space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${adminOpen ? "max-h-[500px]" : "max-h-0"}`}>
+                <li>
+                  <Link href="/admin/avisos" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/avisos") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                    <Bell size={20} />
+                    <span>Gestión de Avisos</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/documentos" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/documentos") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                    <FileText size={20} />
+                    <span>Gestión de Documentos</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/users" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/users") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                    <Users size={20} />
+                    <span>Gestión de Usuarios</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/publicador" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/publicador") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                    <MailboxIcon size={20} />
+                    <span>Gestión de publicaciones</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("#") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                    <Cake size={20} />
+                    <span>Tarjetas de Cumpleaños</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/set-vacations" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/set-vacations") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                    <Sunset size={20} />
+                    <span>Gestión de Vacaciones</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/jefes" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/jefes") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                    <Handshake size={20} />
+                    <span>Coordinadores & Encargados</span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
 
-      <li>
-        <Link
-          href="/admin/users"
-          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-            isActive("/admin/users")
-              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
-              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-          }`}
-        >
-          <Users size={20} />
-          <span>Gestión de Usuarios</span>
-        </Link>
-      </li>
-
-      <li>
-        <Link
-          href="/admin/publicador"
-          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-            isActive("/admin/publicador")
-              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
-              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-          }`}
-        >
-          <MailboxIcon size={20} />
-          <span>Gestión de publicaciones</span>
-        </Link>
-      </li>
-
-      <li>
-        <Link
-          href="#"
-          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-            isActive("#")
-              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
-              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-          }`}
-        >
-          <Cake size={20} />
-          <span>Tarjetas de Cumpleaños</span>
-        </Link>
-      </li>
-
-      <li>
-        <Link
-          href="/admin/set-vacations"
-          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-            isActive("/admin/set-vacations")
-              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
-              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-          }`}
-        >
-          <Sunset size={20} />
-          <span>Gestión de Vacaciones</span>
-        </Link>
-                <Link
-          href="/admin/jefes"
-          className={`flex items-center gap-3 p-2 rounded-md transition-all ${
-            isActive("/admin/jefes")
-              ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]"
-              : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"
-          }`}
-        >
-          <Handshake size={20} />
-          <span>Coordinadores & Encargados</span>
-        </Link>
-      </li>
-    </ul>
-  </div>
-)}
           <div className="p-4 border-t">
             <button
               onClick={handleSignOut}
@@ -382,4 +288,3 @@ useEffect(() => {
     </>
   )
 }
-

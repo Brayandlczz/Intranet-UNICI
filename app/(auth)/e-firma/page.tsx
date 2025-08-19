@@ -1,18 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Upload } from "lucide-react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Mosaic } from "react-loading-indicators";
 
 export default function UploadArchivo() {
   const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(true); 
   const supabase = createClientComponentClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsUploading(false), 1000); 
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
+    }
+  };
+
+  const resetFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -21,7 +33,8 @@ export default function UploadArchivo() {
     setIsUploading(true);
 
     try {
-      const filePath = `uploads/${Date.now()}_${file.name}`;
+      const safeName = file.name.replace(/\s+/g, "_");
+      const filePath = `firmas/${Date.now()}_${safeName}`;
       const { error } = await supabase.storage
         .from("digital-sign-employees")
         .upload(filePath, file);
@@ -32,6 +45,7 @@ export default function UploadArchivo() {
       } else {
         alert("Archivo subido con éxito.");
         setFile(null);
+        resetFileInput();
       }
     } catch (err) {
       console.error("Error inesperado:", err);
@@ -43,9 +57,9 @@ export default function UploadArchivo() {
 
   if (isUploading) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-full bg-gray-50">
+      <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gray-50">
         <Mosaic color="#2464ec" size="medium" />
-        <p className="mt-4 text-gray-600 text-center">Subiendo archivo...</p>
+        <p className="mt-4 text-gray-600 text-center">Cargando...</p>
       </div>
     );
   }
@@ -68,14 +82,15 @@ export default function UploadArchivo() {
           className="flex flex-col items-center justify-center w-full p-8 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition"
         >
           <Upload className="w-16 h-16 text-gray-400" />
-          <p className="mt-4 text-lg text-gray-600">
-            {file ? file.name : "Haz clic o arrastra un archivo aquí"}
+          <p className="text-center mt-4 text-lg text-gray-600">
+            {file ? file.name : "Haz clic aquí para cargar tu firma digital."}
           </p>
           <input
             id="file-upload"
             type="file"
             className="hidden"
             onChange={handleFileChange}
+            ref={fileInputRef}
           />
         </label>
 

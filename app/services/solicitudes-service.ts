@@ -49,7 +49,6 @@ export type SolicitudCumpleanosData = {
 }
 
 export const SolicitudesService = {
-  // Solicitudes de vacaciones
   async crearSolicitudVacaciones(data: SolicitudVacacionesData) {
     const supabase = createClientComponentClient()
     const { data: result, error } = await supabase.from("solicitudes_vacaciones").insert(data).select()
@@ -58,7 +57,6 @@ export const SolicitudesService = {
     return { success: true, message: "Solicitud de vacaciones enviada correctamente", data: result }
   },
 
-  // Solicitudes de permisos
   async crearSolicitudPermisos(data: SolicitudPermisosData) {
     const supabase = createClientComponentClient()
     const { data: result, error } = await supabase.from("solicitudes_permisos").insert(data).select()
@@ -67,7 +65,6 @@ export const SolicitudesService = {
     return { success: true, message: "Solicitud de permiso enviada correctamente", data: result }
   },
 
-  // Solicitudes de retardos
   async crearSolicitudRetardos(data: SolicitudRetardosData) {
     const supabase = createClientComponentClient()
     const { data: result, error } = await supabase.from("solicitudes_retardos").insert(data).select()
@@ -76,7 +73,6 @@ export const SolicitudesService = {
     return { success: true, message: "Solicitud de retardo enviada correctamente", data: result }
   },
 
-  // Solicitudes de incapacidades
   async crearSolicitudIncapacidades(data: SolicitudIncapacidadesData) {
     const supabase = createClientComponentClient()
     const { data: result, error } = await supabase.from("solicitudes_incapacidades").insert(data).select()
@@ -85,7 +81,6 @@ export const SolicitudesService = {
     return { success: true, message: "Solicitud de incapacidad enviada correctamente", data: result }
   },
 
-  // Solicitudes de cumpleaños
   async crearSolicitudCumpleanos(data: SolicitudCumpleanosData) {
     const supabase = createClientComponentClient()
     const { data: result, error } = await supabase.from("solicitudes_cumpleanos").insert(data).select()

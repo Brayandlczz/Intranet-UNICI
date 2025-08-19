@@ -43,7 +43,6 @@ export default function DirectorioPage() {
     cargarEmpleados()
   }, [supabase])
 
-  // Mostrar estado de carga
   if (loading) {
     return (
       <div className="container mx-auto py-6 flex flex-col items-center justify-center min-h-[50vh]">

@@ -6,12 +6,10 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
 
-  // Obtener la sesión actual
   const {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Agregar encabezados de depuración
   const debugHeaders = new Headers(res.headers)
   debugHeaders.set("x-middleware-cache", "no-cache")
   debugHeaders.set("x-middleware-invoked", "true")
@@ -21,12 +19,10 @@ export async function middleware(req: NextRequest) {
     debugHeaders.set("x-auth-user-id", session.user.id)
     debugHeaders.set("x-auth-user-email", session.user.email || "no-email")
 
-    // Calcular tiempo de expiración
     const expiresAt = session.expires_at ? new Date(session.expires_at * 1000).toISOString() : "unknown"
     debugHeaders.set("x-auth-expires", expiresAt)
   }
 
-  // Si el usuario no está autenticado y está intentando acceder a una ruta protegida
   if (
     !session &&
     !req.nextUrl.pathname.startsWith("/_next") &&
@@ -42,7 +38,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  // Si el usuario está autenticado y está intentando acceder a la página de login
   if (session && req.nextUrl.pathname === "/") {
     debugHeaders.set("x-redirect-reason", "authenticated-login-page")
     const redirectUrl = req.nextUrl.clone()
@@ -50,14 +45,12 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  // Crear una nueva respuesta con los encabezados de depuración
   const debugResponse = NextResponse.next({
     request: {
       headers: req.headers,
     },
   })
 
-  // Copiar todos los encabezados de depuración a la respuesta
   debugHeaders.forEach((value, key) => {
     debugResponse.headers.set(key, value)
   })

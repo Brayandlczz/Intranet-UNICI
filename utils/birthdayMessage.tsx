@@ -13,6 +13,8 @@ interface BirthdayMessageProps {
   ticksPerChar?: number
 }
 
+let birthdayShownThisSession = false
+
 export default function BirthdayMessage({
   userId,
   message = "¡La comunidad UNICI te desea un Feliz cumpleaños! Que tengas un día espectacular.",
@@ -24,6 +26,7 @@ export default function BirthdayMessage({
   const { width, height } = useWindowSize()
 
   const [isBirthday, setIsBirthday] = useState(false)
+  const [shouldShowAnimation, setShouldShowAnimation] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [confettiVisible, setConfettiVisible] = useState(true)
 
@@ -46,13 +49,18 @@ export default function BirthdayMessage({
 
         const sameDay = today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth()
         setIsBirthday(sameDay)
+        
+        if (sameDay && !birthdayShownThisSession) {
+          setShouldShowAnimation(true)
+          birthdayShownThisSession = true 
+        }
       }
     }
     checkBirthday()
   }, [userId, supabase])
 
   useEffect(() => {
-    if (isBirthday) {
+    if (shouldShowAnimation) {
       setShowConfetti(true)
       setConfettiVisible(true)
 
@@ -64,11 +72,11 @@ export default function BirthdayMessage({
         clearTimeout(hideTimer)
       }
     }
-  }, [isBirthday])
+  }, [shouldShowAnimation])
 
   useEffect(() => {
     if (!birthdayTextRef.current) return
-    if (!isBirthday) return
+    if (!shouldShowAnimation) return
 
     const el = birthdayTextRef.current
     el.textContent = ""
@@ -96,22 +104,21 @@ export default function BirthdayMessage({
     return () => {
       gsap.ticker.remove(type)
     }
-  }, [message, charsPerTick, ticksPerChar, isBirthday])
+  }, [message, charsPerTick, ticksPerChar, shouldShowAnimation])
 
-  if (!isBirthday) return null
+  if (!shouldShowAnimation) return null
 
   return (
     <>
-<div
-  className={`fixed top-0 left-0 w-full h-full z-50 transition-opacity duration-1000 ${
-    confettiVisible ? "opacity-100 pointer-events-none" : "opacity-0 pointer-events-none"
-  }`}
-  aria-hidden={!confettiVisible}
-  style={{ margin: 0, padding: 0 }}
->
-  {showConfetti && <Confetti width={width} height={height} numberOfPieces={400} recycle={true} />}
-</div>
-
+      <div
+        className={`fixed top-0 left-0 w-full h-full z-50 transition-opacity duration-1000 ${
+          confettiVisible ? "opacity-100 pointer-events-none" : "opacity-0 pointer-events-none"
+        }`}
+        aria-hidden={!confettiVisible}
+        style={{ margin: 0, padding: 0 }}
+      >
+        {showConfetti && <Confetti width={width} height={height} numberOfPieces={400} recycle={true} />}
+      </div>
 
       <p
         ref={birthdayTextRef}

@@ -15,7 +15,6 @@ export function DirectorioClient({ empleadosIniciales }: DirectorioClientProps) 
   const [filteredEmpleados, setFilteredEmpleados] = useState<EmpleadoData[]>(empleadosIniciales)
   const [searchTerm, setSearchTerm] = useState("")
 
-  // Filtrar empleados cuando cambia el término de búsqueda
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredEmpleados(empleados)

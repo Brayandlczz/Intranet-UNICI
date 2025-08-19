@@ -113,6 +113,15 @@ export default function SolicitudIncapacidadesForm() {
     }
   }
 
+  if(loading){
+    return (
+    <div className="flex flex-col items-center justify-center h-screen">
+      <Mosaic color="#2464ec" size="medium" />
+      <p className="mt-4 text-gray-600 text-center">Cargando datos del solicitante...</p>
+    </div>
+    )
+  }
+
   if (isSubmitting) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -137,46 +146,46 @@ export default function SolicitudIncapacidadesForm() {
 
       <SolicitudFormBase title="Solicitud de permiso por incapacidad" onSubmit={handleSubmit}>
           <h2 className="text-center">Complete el formulario para justificar un permiso por incapacidad.</h2>
-        <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6 cursor-not-allowed">
+        <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6">
           <h3 className="text-lg font-semibold">Datos del solicitante</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label htmlFor="fecha_solicitud">Fecha de solicitud</Label>
-              <Input id="fecha_solicitud" name="fecha_solicitud" type="date" readOnly value={fechaActual} />
+              <Input id="fecha_solicitud" name="fecha_solicitud" type="date" readOnly value={fechaActual} className="cursor-not-allowed"/>
             </div>
 
             <div className="space-y-1">
               <Label>Nombre completo</Label>
-              <Input readOnly value={perfil?.nombre || ""} />
+              <Input readOnly value={perfil?.nombre || ""} className="cursor-not-allowed"/>
             </div>
 
             <div className="space-y-1">
               <Label>Departamento</Label>
-              <Input readOnly value={perfil?.departamento || ""} />
+              <Input readOnly value={perfil?.departamento || ""} className="cursor-not-allowed"/>
             </div>
 
             <div className="space-y-1">
               <Label>Puesto</Label>
-              <Input readOnly value={perfil?.puesto || ""} />
+              <Input readOnly value={perfil?.puesto || ""} className="cursor-not-allowed"/>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="fecha_inicio">Fecha de inicio</Label>
+            <Label htmlFor="fecha_inicio">Fecha de inicio de incapacidad</Label>
             <Input id="fecha_inicio" name="fecha_inicio" type="date" required />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="fecha_fin">Fecha de fin</Label>
+            <Label htmlFor="fecha_fin">Fecha de fin de incapacidad</Label>
             <Input id="fecha_fin" name="fecha_fin" type="date" required />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dias_incapacidad">Días de incapacidad</Label>
+          <Label htmlFor="dias_incapacidad">Total de días de incapacidad</Label>
           <Input id="dias_incapacidad" name="dias_incapacidad" type="number" required min="1" placeholder="Ejemplo: 1"/>
         </div>
 
@@ -186,8 +195,8 @@ export default function SolicitudIncapacidadesForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="diagnostico">Diagnóstico</Label>
-          <Textarea id="diagnostico" name="diagnostico" placeholder="Describa el diagnóstico proporcionado por el médico..." />
+          <Label htmlFor="diagnostico">Diagnóstico médico</Label>
+          <Textarea id="diagnostico" name="diagnostico" placeholder="Describa brevemente el diagnóstico proporcionado por el médico..." />
         </div>
       </SolicitudFormBase>
     </div>

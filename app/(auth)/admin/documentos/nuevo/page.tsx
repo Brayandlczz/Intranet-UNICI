@@ -1,4 +1,3 @@
-// app/(auth)/admin/documentos/nuevo/page.tsx
 import { DocumentoForm } from "@/app/components/documentos/documento-form"
 
 export default function NuevoDocumentoPage() {

@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Home, Search, Folder } from "lucide-react";
-import { Mosaic } from "react-loading-indicators"; 
+import { Home, Search } from "lucide-react";
+import { Mosaic } from "react-loading-indicators";
 
 type Post = {
   id: string;
@@ -21,16 +21,8 @@ const categories = [
   { label: "Seguridad", slug: "seguridad" },
 ];
 
-const categoryIcons: Record<string, React.ReactNode> = {
-  tendencias: <Folder size={16} />,
-  metodologias: <Folder size={16} />,
-  tecnologia: <Folder size={16} />,
-  seguridad: <Folder size={16} />,
-};
-
 const carouselImages = ["/carousel_1.webp", "/carousel_2.webp", "/carousel_3.webp"];
-
-const FADE_DURATION = 2000; 
+const FADE_DURATION = 2000;
 
 const Blog: React.FC = () => {
   const supabase = createClientComponentClient();
@@ -46,18 +38,14 @@ const Blog: React.FC = () => {
   useEffect(() => {
     async function fetchPosts() {
       setLoading(true);
-      let query = supabase
+      const { data, error } = await supabase
         .from("posts")
         .select("id, title, content, created_at")
         .order("created_at", { ascending: false });
 
-      const { data, error } = await query;
+      if (error) console.error("Error fetching posts:", error);
+      else if (data) setPosts(data);
 
-      if (error) {
-        console.error("Error fetching posts:", error);
-      } else if (data) {
-        setPosts(data);
-      }
       setLoading(false);
     }
     fetchPosts();
@@ -68,7 +56,6 @@ const Blog: React.FC = () => {
       setPrevIndex(currentIndex);
       setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [currentIndex]);
 
@@ -89,7 +76,6 @@ const Blog: React.FC = () => {
       content,
       immediatelyRender: false,
     });
-
     if (!editor) return null;
     return <EditorContent editor={editor} />;
   };
@@ -116,6 +102,8 @@ const Blog: React.FC = () => {
               animation: `fadeOut ${FADE_DURATION}ms forwards ease-in-out`,
               zIndex: 5,
               pointerEvents: "none",
+              backfaceVisibility: "hidden",
+              transform: "translateZ(0)",
             }}
             draggable={false}
             loading="lazy"
@@ -132,6 +120,8 @@ const Blog: React.FC = () => {
             animation: `fadeIn ${FADE_DURATION}ms forwards ease-in-out`,
             zIndex: 10,
             pointerEvents: "none",
+            backfaceVisibility: "hidden",
+            transform: "translateZ(0)",
           }}
           draggable={false}
           loading="lazy"
@@ -168,7 +158,6 @@ const Blog: React.FC = () => {
                 : "text-gray-800 hover:text-blue-500"
             }`}
             onClick={() => setSelectedCategory("todo")}
-            aria-label="Categoría Todo"
           >
             <Home size={18} />
             <span className="font-semibold">Todo</span>
@@ -185,7 +174,6 @@ const Blog: React.FC = () => {
                     : "text-gray-800 hover:text-blue-500"
                 }`}
                 onClick={() => setSelectedCategory(cat.slug)}
-                aria-label={`Categoría ${cat.label}`}
               >
                 {cat.label}
               </button>
@@ -198,13 +186,9 @@ const Blog: React.FC = () => {
             placeholder="Buscar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Buscar artículos"
             className="bg-transparent flex-grow px-4 py-2 text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
-          <button
-            className="bg-blue-700 hover:bg-blue-800 p-2 rounded-r-lg text-white flex items-center justify-center"
-            aria-label="Buscar"
-          >
+          <button className="bg-blue-700 hover:bg-blue-800 p-2 rounded-r-lg text-white flex items-center justify-center">
             <Search size={28} />
           </button>
         </div>
