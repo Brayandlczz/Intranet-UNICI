@@ -1,4 +1,3 @@
-// app/components/avisos/avisos-table.tsx
 "use client"
 
 import { useState } from "react"
@@ -31,7 +30,6 @@ export function AvisosTable({ avisos }: AvisosTableProps) {
       const result = await AvisosService.deleteAviso(id)
 
       if (result.success) {
-        // Actualizar la lista localmente
         setAvisosList(avisosList.filter((aviso) => aviso.id !== id))
         router.refresh()
       } else {

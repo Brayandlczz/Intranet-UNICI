@@ -17,7 +17,6 @@ export function useJefeDirecto() {
       try {
         const supabase = createClientComponentClient()
 
-        // Obtener el perfil del usuario actual para encontrar su jefe_directo_id
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("jefe_directo_id")

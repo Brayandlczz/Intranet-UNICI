@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Mosaic } from "react-loading-indicators"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { User, Pencil, Save, X, Upload, Loader2, AlertTriangle } from "lucide-react"
+import { User, Pencil, Save, X, Upload, AlertTriangle } from "lucide-react"
 
 type Profile = {
   id: string
@@ -153,7 +153,6 @@ export default function PerfilPage() {
   }, [])
 
   useEffect(() => {
-    console.log("🔄 Iniciando fetch de jefes directos...")
 
     const fetchProfiles = async () => {
       try {
@@ -167,7 +166,6 @@ export default function PerfilPage() {
           return
         }
 
-        console.log("✅ Datos recibidos de Supabase:", data)
 
         if (!data || data.length === 0) {
           console.warn("⚠️ No se encontraron jefes directos.")
@@ -651,7 +649,7 @@ export default function PerfilPage() {
                   <>
                     <div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
                         <input
                           type="text"
                           name="nombre"

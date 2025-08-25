@@ -19,7 +19,7 @@ export async function middleware(req: NextRequest) {
 
   const isStaticFile = req.nextUrl.pathname.includes(".")
 
-  console.log(`[Middleware] Ruta: ${req.nextUrl.pathname}, Autenticado: ${!!session}`)
+  console.log(`[Middleware] Ruta: ${req.nextUrl.pathname}, Autenticado: ${!!session}`) //logs de consola
 
   if (!session && !isPublicRoute && !isStaticFile) {
     console.log(`[Middleware] Redirigiendo a login desde: ${req.nextUrl.pathname}`)

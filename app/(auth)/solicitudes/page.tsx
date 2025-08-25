@@ -13,37 +13,37 @@ export default function GestorSolicitudes() {
       titulo: "Solicitud de Permiso",
       descripcion: "Solicita un lapso de tiempo por asuntos personales o administrativos.",
       ruta: "/permisos",
-      icono: <CalendarDays className="h-6 w-6 text-blue-600" />,
+      icono: <CalendarDays className="h-5 w-5 text-blue-600" />,
     },
     {
       titulo: "Solicitud por Retardo",
       descripcion: "Justifica el motivo de tu retraso en el horario de entrada laboral.",
       ruta: "/retardos",
-      icono: <Clock className="h-6 w-6 text-blue-600" />,
+      icono: <Clock className="h-5 w-5 text-blue-600" />,
     },
     {
       titulo: "Solicitud por Cumpleaños",
       descripcion: "Solicita el día libre para festejar tu cumpleaños con tus seres queridos.",
       ruta: "/birthday",
-      icono: <Cake className="h-6 w-6 text-blue-600" />,
+      icono: <Cake className="h-5 w-5 text-blue-600" />,
     },
     {
       titulo: "Solicitud por Incapacidad",
       descripcion: "Solicita un permiso laboral por incapacidad médica.",
       ruta: "/incapacidad",
-      icono: <HeartPulse className="h-6 w-6 text-blue-600" />,
+      icono: <HeartPulse className="h-5 w-5 text-blue-600" />,
     },
     {
       titulo: "Solicitud de vacaciones",
       descripcion: "Solicita un periodo vacacional utilizando tus días disponibles.",
       ruta: "/vacaciones",
-      icono: <TreePalm className="h-6 w-6 text-blue-600" />,
+      icono: <TreePalm className="h-5 w-5 text-blue-600" />,
     },
     {
       titulo: "Solicitud de viáticos",
       descripcion: "Solicita viáticos para cubrir gastos relacionados con actividades laborales autorizadas.",
       ruta: "/vacaciones",
-      icono: <Plane className="h-6 w-6 text-blue-600" />,
+      icono: <Plane className="h-5 w-5 text-blue-600" />,
     },
   ];
 

@@ -9,25 +9,32 @@ const supabaseAdmin = createClient(
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { email, password } = body
+    const { nombre, email, password, rol_id } = body
 
-    if (!email || !password) {
-      return NextResponse.json({ error: "Faltan datos obligatorios" }, { status: 400 })
+    if (!nombre || !email || !password || !rol_id) {
+      return NextResponse.json(
+        { error: "Faltan datos obligatorios" },
+        { status: 400 }
+      )
     }
 
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-    })
-  
+  const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    user_metadata: {
+      nombre: nombre.trim(),
+      rol_id: rol_id.trim(),
+    },
+  })
+
     if (error) {
-      console.log("Error supabase:", error)
+      console.error("Error creando usuario en Supabase:", error)
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     return NextResponse.json({ user: data.user }, { status: 201 })
   } catch (err: any) {
-    console.log("Error catch:", err)
+    console.error("Error catch:", err)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }

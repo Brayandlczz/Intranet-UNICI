@@ -18,12 +18,11 @@ export function SolicitudVacacionesForm() {
   const [fechaFin, setFechaFin] = useState("")
   const [diasCalculados, setDiasCalculados] = useState<number | null>(null)
 
-  // Calcular días hábiles entre fechas
   const calcularDiasHabiles = () => {
     if (fechaInicio && fechaFin) {
       const inicio = parseISO(fechaInicio)
       const fin = parseISO(fechaFin)
-      const dias = differenceInBusinessDays(fin, inicio) + 1 // +1 para incluir el día final
+      const dias = differenceInBusinessDays(fin, inicio) + 1 
       setDiasCalculados(dias > 0 ? dias : 0)
     } else {
       setDiasCalculados(null)

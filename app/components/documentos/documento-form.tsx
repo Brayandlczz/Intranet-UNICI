@@ -1,4 +1,3 @@
-// app/components/documentos/documento-form.tsx
 "use client"
 
 import type React from "react"
@@ -40,7 +39,6 @@ export function DocumentoForm({ documento, isEditing = false }: DocumentoFormPro
   const router = useRouter()
   const supabase = createClientComponentClient()
 
-  // Cargar la lista de empleados para documentos personales
   useEffect(() => {
     async function cargarEmpleados() {
       setLoadingEmpleados(true)
@@ -87,7 +85,6 @@ export function DocumentoForm({ documento, isEditing = false }: DocumentoFormPro
     setFormData(prev => ({
       ...prev,
       tipo,
-      // Si cambia de personal a general, limpiar los empleados seleccionados
       empleados_ids: tipo === 'general' ? [] : prev.empleados_ids
     }))
   }
@@ -119,7 +116,6 @@ export function DocumentoForm({ documento, isEditing = false }: DocumentoFormPro
         setSuccess(`${result.message} Redirigiendo...`)
         setIsRedirecting(true)
 
-        // Usar setTimeout para dar tiempo a que se muestre el mensaje
         setTimeout(() => {
           router.push("/admin/documentos")
         }, 1500)
@@ -272,7 +268,6 @@ export function DocumentoForm({ documento, isEditing = false }: DocumentoFormPro
                 onChange={handleFileChange}
                 className="sr-only"
                 disabled={isSubmitting}
-               // required={!isEditing && !documento?.archivo_url}
               />
               <label
                 htmlFor="archivo"

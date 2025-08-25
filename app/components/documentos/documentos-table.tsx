@@ -1,4 +1,3 @@
-// app/components/documentos/documentos-table.tsx
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
@@ -31,31 +30,25 @@ type DocumentosTableProps = {
   }[]
 }
 
-// Actualizar la función del componente para incluir los filtros y la búsqueda
 export function DocumentosTable({ documentos, todosEmpleados = [] }: DocumentosTableProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [documentosList, setDocumentosList] = useState<Documento[]>(documentos)
   const router = useRouter()
 
-  // Estados para búsqueda y filtros
   const [searchTerm, setSearchTerm] = useState("")
   const [tipoFilter, setTipoFilter] = useState<"todos" | "general" | "personal">("todos")
   const [empleadoFilter, setEmpleadoFilter] = useState<string>("todos")
   const [showFilters, setShowFilters] = useState(false)
 
-  // Aplicar filtros cuando cambien
   const filteredDocumentos = useMemo(() => {
     return documentos.filter((doc) => {
-      // Filtro por término de búsqueda
       const matchesSearch =
         doc.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doc.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
 
-      // Filtro por tipo
       const matchesTipo = tipoFilter === "todos" || doc.tipo === tipoFilter
 
-      // Filtro por empleado
       const matchesEmpleado =
         empleadoFilter === "todos" ||
         (doc.tipo === "personal" && doc.empleados?.some((emp) => emp.id === empleadoFilter))
@@ -64,12 +57,10 @@ export function DocumentosTable({ documentos, todosEmpleados = [] }: DocumentosT
     })
   }, [documentos, searchTerm, tipoFilter, empleadoFilter])
 
-  // Actualizar la lista cuando cambien los filtros
   useEffect(() => {
     setDocumentosList(filteredDocumentos)
   }, [filteredDocumentos])
 
-  // Resetear filtros
   const resetFilters = () => {
     setSearchTerm("")
     setTipoFilter("todos")
@@ -88,7 +79,6 @@ export function DocumentosTable({ documentos, todosEmpleados = [] }: DocumentosT
       const result = await DocumentosService.deleteDocumento(id)
 
       if (result.success) {
-        // Actualizar la lista localmente
         setDocumentosList(documentosList.filter((documento) => documento.id !== id))
         router.refresh()
       } else {
@@ -102,12 +92,10 @@ export function DocumentosTable({ documentos, todosEmpleados = [] }: DocumentosT
     }
   }
 
-  // Función para obtener la extensión del archivo
   const getFileExtension = (filename: string) => {
     return filename.split(".").pop()?.toLowerCase() || ""
   }
 
-  // Función para determinar el tipo de archivo
   const getFileType = (filename: string) => {
     const ext = getFileExtension(filename)
     if (["pdf"].includes(ext)) return "PDF"
@@ -118,7 +106,6 @@ export function DocumentosTable({ documentos, todosEmpleados = [] }: DocumentosT
   }
 
   if (documentosList.length === 0) {
-    // Verificar si hay filtros activos
     const hayFiltrosActivos = searchTerm !== "" || tipoFilter !== "todos" || empleadoFilter !== "todos";
     
     return (

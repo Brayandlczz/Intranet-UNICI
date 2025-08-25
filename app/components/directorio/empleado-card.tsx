@@ -61,7 +61,6 @@ export function EmpleadoCard({ empleado }: EmpleadoCardProps) {
   )
 }
 
-// Función para obtener las iniciales del nombre
 function obtenerIniciales(nombre: string): string {
   if (!nombre || nombre === "Sin nombre") return "U"
 

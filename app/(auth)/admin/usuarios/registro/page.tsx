@@ -61,7 +61,7 @@ export default function RegistroUsuarioForm() {
       }
 
       setSuccessMessage("¡Usuario registrado con éxito!")
-      setTimeout(() => router.push("/admin/users"), 2000)
+      setTimeout(() => router.push("/admin/usuarios"), 2000)
     } catch (err: any) {
       setError(err.message || "Error de red")
       setIsSubmitting(false)
@@ -70,7 +70,7 @@ export default function RegistroUsuarioForm() {
     }
   }
 
-  const handleCancelar = () => router.push("/admin/users")
+  const handleCancelar = () => router.push("/admin/usuarios")
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
