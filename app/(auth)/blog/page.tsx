@@ -49,7 +49,7 @@ const Blog: React.FC = () => {
       setLoading(false);
     }
     fetchPosts();
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {

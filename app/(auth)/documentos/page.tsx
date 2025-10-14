@@ -45,7 +45,7 @@ export default function DocumentosPage() {
     }
 
     inicializar();
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     if (!documentos.length) return;
@@ -90,7 +90,7 @@ export default function DocumentosPage() {
 
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-center text-2xl font-bold mb-6">Documentos</h1>
+      <h1 className="text-center text-2xl font-bold mb-6">Políticas & reglamentos</h1>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">{error}</div>

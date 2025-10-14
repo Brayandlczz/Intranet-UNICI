@@ -24,7 +24,7 @@ export default async function GestionDocumentosPage() {
 
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("role_id, roles(nombre)")
+    .select("rol_id, roles(nombre)")
     .eq("id", session.user.id)
     .single()
 
@@ -40,7 +40,7 @@ export default async function GestionDocumentosPage() {
         </div>
       </div>
     )
-  }
+  } 
 
   const { data: documentos, error: docError } = await supabase
     .from("documentos")

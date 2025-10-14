@@ -61,7 +61,7 @@ export default function DirectorioPage() {
     }
 
     cargarEmpleados()
-  }, [supabase])
+  }, [])
 
 if (loading) {
   return (

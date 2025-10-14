@@ -59,7 +59,7 @@ export function DocumentoForm({ documento, isEditing = false }: DocumentoFormPro
     }
     
     cargarEmpleados()
-  }, [supabase])
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target

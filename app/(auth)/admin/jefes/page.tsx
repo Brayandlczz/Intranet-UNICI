@@ -1,10 +1,8 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { SolicitudFormBase } from "./form-base"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Users, UserCheck, Shield } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Mosaic } from "react-loading-indicators"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
@@ -115,76 +113,102 @@ const handleSubmit = async (formData: any): Promise<{ success: boolean; message:
 
   if (isSubmitting || loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <Mosaic color="#2464ec" size="medium" />
-        <p className="mt-4 text-gray-600 text-center">
-          {loading ? "Cargando..." : "Redirigiendo, por favor espere..."}
+        <p className="mt-4 text-gray-600 text-center text-lg font-semibold">
+          {loading ? "Cargando información..." : "Procesando solicitud, por favor espere..."}
         </p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-6 flex items-center">
-        <button
-          onClick={() => router.back()}
-          className="mr-4 p-2 rounded-full hover:bg-gray-100"
-          aria-label="Volver"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <h1 className="text-xl font-semibold">Volver</h1>
-      </div>
-
-      <SolicitudFormBase title="Registro de jefes/encargados por área." onSubmit={handleSubmit}>
-        <h2 className="text-center">Complete el formulario para dar de alta a jefes directos.</h2>
-        <div className="bg-gray-100 p-4 rounded-md border space-y-4 mb-6 cursor-not-allowed">
-          <h3 className="text-lg font-semibold">Datos del encargado registrante:</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <Label htmlFor="fecha_solicitud">Fecha del registro</Label>
-              <Input id="fecha_solicitud" name="fecha_solicitud" type="date" readOnly value={fechaActual} />
-            </div>
-
-            <div className="space-y-1">
-              <Label>Nombre completo</Label>
-              <Input readOnly value={perfil?.nombre || ""} />
-            </div>
-
-            <div className="space-y-1">
-              <Label>Departamento</Label>
-              <Input readOnly value={perfil?.departamento || ""} />
-            </div>
-
-            <div className="space-y-1">
-              <Label>Puesto</Label>
-              <Input readOnly value={perfil?.puesto || ""} />
+    <div className="max-h-screen">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-6 sm:mb-8">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center justify-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200 border border-blue-200"
+              aria-label="Volver"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-blue-100 rounded-xl">
+                <Shield className="w-8 h-8 text-blue-600" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Designación de Jefes Directos | INTRANET</h1>
+                <p className="text-gray-600 mt-1 text-sm sm:text-base">Gestiona la designación de jefes y jerarquía institucional</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <Label htmlFor="id_empleado">Seleccione un usuario del listado para designarlo como jefe:</Label>
-          <select
-            id="id_empleado"
-            name="id_empleado"
-            required
-            className="w-full border rounded-md p-2"
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Seleccione un usuario
-            </option>
-            {usuarios.map((usuario) => (
-              <option key={usuario.id} value={usuario.id}>
-                {usuario.nombre}
-              </option>
-            ))}
-          </select>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-100">
+            <div className="flex flex-col items-center gap-3">
+              <UserCheck className="w-6 h-6 text-blue-600" />
+              <h2 className="text-xl font-semibold text-gray-900">Formulario de Designación</h2>
+              <p className="text-gray-600 text-sm">Complete el formulario para designar jefes directos por área</p>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="flex flex-col items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Users className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="text-center">
+                  <Label htmlFor="id_empleado" className="text-lg font-semibold text-gray-900">
+                    Seleccione un Usuario para Designar como Jefe
+                  </Label>
+                  <p className="text-gray-600 text-sm mt-1">
+                    Elija del listado el empleado que será designado como jefe directo
+                  </p>
+                </div>
+              </div>
+
+              <select
+                id="id_empleado"
+                name="id_empleado"
+                required
+                className="w-full border-2 border-gray-200 rounded-xl p-4 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-blue-300"
+                defaultValue=""
+              >
+                <option value="" disabled className="text-gray-500">
+                  Seleccione un usuario del listado
+                </option>
+                {usuarios.map((usuario) => (
+                  <option key={usuario.id} value={usuario.id} className="text-gray-900">
+                    {usuario.nombre}
+                  </option>
+                ))}
+              </select>
+
+              {usuarios.length > 0 && (
+                <p className="text-sm text-gray-500 text-center">
+                  Total de usuarios disponibles: <span className="font-semibold text-blue-600">{usuarios.length}</span>
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <UserCheck className="w-5 h-5" />
+                Designar Jefe Directo
+              </button>
+            </div>
+          </div>
         </div>
-      </SolicitudFormBase>
+      </div>
     </div>
   )
 }

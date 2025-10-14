@@ -27,7 +27,7 @@ export default function RegistroUsuarioForm() {
       }
     }
     fetchRoles()
-  }, [supabase])
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

@@ -6,18 +6,20 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useEffect, useState } from "react"
 import { 
   LayoutDashboard, User, Calendar, BookOpen, Bell, LogOut, Menu, X, 
-  FileText, FilePen, Megaphone, Users, Cake, Sunset, Handshake, HandHeart, MailboxIcon, PenLine 
+  FileText, FilePen, Megaphone, Users, Cake, Sunset, Handshake, HandHeart, MailboxIcon, PenLine, 
+  Scale,
+  FolderOpen
 } from "lucide-react"
 
 type Profile = {
   id: string
   nombre?: string
   email?: string
-  role_id?: string
+  rol_id?: string
   foto_url?: string
   roles?: { nombre: string } 
 }
-
+  
 export function Sidebar() {
   const [adminOpen, setAdminOpen] = useState(false)
   const pathname = usePathname()
@@ -62,7 +64,7 @@ export function Sidebar() {
     }
 
     fetchProfile()
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     if (!profile?.id) return
@@ -203,8 +205,8 @@ export function Sidebar() {
               </li>
               <li>
                 <Link href="/documentos" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/documentos") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
-                  <FileText size={20} />
-                  <span>Documentos</span>
+                  <Scale size={20} />
+                  <span>Políticas y reglamentos</span>
                 </Link>
               </li>
               <li>
@@ -220,7 +222,7 @@ export function Sidebar() {
             <div className="p-4 border-t">
               <button
                 onClick={() => setAdminOpen((prev) => !prev)}
-                className="flex items-center justify-between w-full text-xs font-medium text-gray-500 mb-2 hover:text-gray-700"
+                className="flex items-center justify-between w-full text-xs text-gray-500 mb-1 hover:text-gray-700"
               >
                 Administración
                 <span>{adminOpen ? "▲" : "▼"}</span>
@@ -230,19 +232,19 @@ export function Sidebar() {
                 <li>
                   <Link href="/admin/avisos" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/avisos") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
                     <Bell size={20} />
-                    <span>Gestión de Avisos</span>
+                    <span>Gestor de avisos</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/admin/documentos" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/documentos") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
                     <FileText size={20} />
-                    <span>Gestión de Documentos</span>
+                    <span>Gestor de documentos</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/admin/usuarios" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/usuarios") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
                     <Users size={20} />
-                    <span>Gestión de Usuarios</span>
+                    <span>Gestor de usuarios</span>
                   </Link>
                 </li>
                 <li>
@@ -254,19 +256,25 @@ export function Sidebar() {
                 <li>
                   <Link href="#" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("#") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
                     <Cake size={20} />
-                    <span>Birthday Cards</span>
+                    <span>Birthday cards</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/admin/set-vacations" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/set-vacations") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                  <Link href="/admin/gestor-vacaciones" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/gestor-vacaciones") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
                     <Sunset size={20} />
-                    <span>Gestión de Vacaciones</span>
+                    <span>Gestión de vacaciones</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/admin/jefes" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/admin/jefes") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
                     <Handshake size={20} />
                     <span>Jefes directos</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/expedientes" className={`flex items-center gap-3 p-2 rounded-md transition-all ${isActive("/expedientes") ? "bg-blue-50 text-blue-700 shadow-[3px_3px_0px_0px_#BFDBFE] translate-y-[-1px]" : "hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-1px]"}`}>
+                    <FolderOpen size={20} />
+                    <span>Expediente personal</span>
                   </Link>
                 </li>
               </ul>

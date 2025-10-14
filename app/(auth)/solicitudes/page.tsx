@@ -64,7 +64,7 @@ export default function GestorSolicitudes() {
   return (
     <div className="container mx-auto py-6">
       <h1 className="text-center text-3xl font-bold mb-4 text-gray-800">
-        Gestor de Solicitudes
+        Registro de Solicitudes
       </h1>
       <p className="text-center text-gray-800 mb-8 whitespace">
         Selecciona un tipo de solicitud para hacerla llegar a los encargados correspondientes.

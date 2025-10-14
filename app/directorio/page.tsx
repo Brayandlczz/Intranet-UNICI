@@ -41,7 +41,7 @@ export default function DirectorioPage() {
     }
 
     cargarEmpleados()
-  }, [supabase])
+  }, [])
 
   if (loading) {
     return (
@@ -56,7 +56,6 @@ export default function DirectorioPage() {
     <div className="container mx-auto py-6">
       <h1 className="text-2xl font-bold mb-6">Directorio de Personal</h1>
 
-      {/* Contenido principal */}
       {error ? (
         <div className="bg-red-50 border border-red-200 p-4 rounded-md">Error al cargar el directorio: {error}</div>
       ) : empleados.length > 0 ? (
@@ -66,7 +65,6 @@ export default function DirectorioPage() {
               key={empleado.id}
               className="bg-white p-4 rounded-md shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100"
             >
-              {/* Imagen de perfil redonda */}
               <div className="flex justify-center mb-3">
                 {empleado.foto_url ? (
                   <img
