@@ -96,7 +96,6 @@ export function AvisosTable({ avisos }: AvisosTableProps) {
                   {format(new Date(aviso.fecha_publicacion), "d 'de' MMMM 'de' yyyy", { locale: es })}
                 </div>
               </td>
-              // app/components/avisos/avisos-table.tsx // Corregir la parte donde renderizamos el creador
               <td className="px-6 py-5 whitespace-nowrap">
                 <div className="text-sm text-gray-900">
                   {aviso.creador?.nombre

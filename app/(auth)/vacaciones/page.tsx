@@ -8,7 +8,7 @@ import { ArrowLeft, Calendar, User, Building, Briefcase, FileText, Clock, CheckC
 import { useRouter } from "next/navigation"
 import { Textarea } from "@/components/ui/textarea"
 import { Mosaic } from "react-loading-indicators"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { supabase } from "@/utils/supabase/client" 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function SolicitudVacacionesForm() {
@@ -26,7 +26,6 @@ export default function SolicitudVacacionesForm() {
   const fechaActual = new Date().toISOString().split("T")[0]
 
   useEffect(() => {
-    const supabase = createClientComponentClient()
 
     const fetchPerfil = async () => {
       setLoading(true)
@@ -66,7 +65,6 @@ export default function SolicitudVacacionesForm() {
   }, [])
 
 const handleSubmit = async (formData: any) => {
-  const supabase = createClientComponentClient()
 
   if (!perfil) {
     return { success: false, message: "No se pudo obtener el perfil del usuario" }

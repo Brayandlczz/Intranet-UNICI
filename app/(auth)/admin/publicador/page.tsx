@@ -3,9 +3,7 @@
 import React, { useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-
-const supabase = createClientComponentClient();
+import { supabase } from "@/utils/supabase/client" 
 
 const BlogPostEditor: React.FC = () => {
   const [title, setTitle] = useState("");

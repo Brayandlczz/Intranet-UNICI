@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/utils/supabase/client" 
 import { Loader2, Search, FileText, Download, Globe, Users, Filter } from "lucide-react";
 import type { Documento } from "@/app/services/documentos-service";
 import { DocumentosService } from "@/app/services/documentos-service";
@@ -16,7 +16,6 @@ export default function DocumentosPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState<"todos" | "general" | "personal">("todos");
   const [userId, setUserId] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
 
   useEffect(() => {
     async function inicializar() {

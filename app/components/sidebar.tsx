@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useEffect, useState } from "react"
 import { 
   LayoutDashboard, User, Calendar, BookOpen, Bell, LogOut, Menu, X, 
@@ -10,6 +9,7 @@ import {
   Scale,
   FolderOpen
 } from "lucide-react"
+import { supabase } from "@/utils/supabase/client" 
 
 type Profile = {
   id: string
@@ -26,7 +26,6 @@ export function Sidebar() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState<number>(0)
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     const fetchProfile = async () => {

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/utils/supabase/client" 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,6 @@ import { Pencil, Trash2, Search, Users, Plus } from "lucide-react";
 const UserManagementView: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
-  const supabase = createClientComponentClient();
   const router = useRouter();
 
   useEffect(() => {

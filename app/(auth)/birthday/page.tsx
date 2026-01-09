@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Mosaic } from "react-loading-indicators"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { supabase } from "@/utils/supabase/client" 
 
 export default function SolicitudCumpleanosForm() {
   const [perfil, setPerfil] = useState<null | {
@@ -33,7 +33,6 @@ export default function SolicitudCumpleanosForm() {
   }
 
   useEffect(() => {
-    const supabase = createClientComponentClient()
 
     const fetchPerfil = async () => {
       setLoading(true)
@@ -96,7 +95,6 @@ export default function SolicitudCumpleanosForm() {
       return { success: false, message: "Solicitud bloqueada fuera del periodo permitido" }
     }
 
-    const supabase = createClientComponentClient()
 
     if (!perfil) {
       return { success: false, message: "No se pudo obtener el perfil del usuario" }

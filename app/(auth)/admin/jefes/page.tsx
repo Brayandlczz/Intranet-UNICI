@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { ArrowLeft, Users, UserCheck, Shield } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Mosaic } from "react-loading-indicators"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { supabase } from "@/utils/supabase/client" 
 
 export default function SolicitudJefesForm() {
   const [perfil, setPerfil] = useState<null | {
@@ -23,7 +23,6 @@ export default function SolicitudJefesForm() {
   const fechaActual = new Date().toISOString().split("T")[0]
 
   useEffect(() => {
-    const supabase = createClientComponentClient()
 
     const fetchPerfilYUsuarios = async () => {
       setLoading(true)

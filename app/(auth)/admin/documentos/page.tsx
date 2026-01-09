@@ -1,78 +1,66 @@
 import Link from "next/link"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
 import { Plus } from "lucide-react"
 import { DocumentosTable } from "@/app/components/documentos/documentos-table"
+import { createClient } from "@supabase/supabase-js"
+
+const supabaseServer = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export default async function GestionDocumentosPage() {
-  const supabase = createServerComponentClient({ cookies })
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session) {
-    return (
-      <div className="container mx-auto py-6">
-        <h1 className="text-2xl font-bold mb-6">Gestión de Documentos</h1>
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          Debes iniciar sesión para acceder a esta página.
-        </div>
-      </div>
-    )
-  }
-
-  const { data: profileData } = await supabase
+  const { data: perfiles, error: perfilesError } = await supabaseServer
     .from("profiles")
-    .select("rol_id, roles(nombre)")
-    .eq("id", session.user.id)
-    .single()
+    .select("id, roles(nombre)")
 
-  const rolNombre = profileData?.roles?.nombre
-  const isAdmin = rolNombre === "admin" || rolNombre === "adminRh"
-
-  if (!isAdmin) {
+  if (perfilesError) {
+    console.error("Error al obtener perfiles:", perfilesError)
     return (
       <div className="container mx-auto py-6">
         <h1 className="text-2xl font-bold mb-6">Gestión de Documentos</h1>
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          No tienes permisos para acceder a esta página.
-        </div>
-      </div>
-    )
-  } 
-
-  const { data: documentos, error: docError } = await supabase
-    .from("documentos")
-    .select(`
-    *,
-    creador:profiles(nombre, email)
-  `)
-    .order("created_at", { ascending: false })
-
-  if (docError) {
-    console.error("Error al obtener documentos:", docError)
-    return (
-      <div className="container mx-auto py-6">
-        <h1 className="text-2xl font-bold mb-6">Gestión de Documentos</h1>
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          Error al cargar documentos: {docError.message}
+          Error al cargar perfiles.
         </div>
       </div>
     )
   }
 
-  const { data: documentosEmpleados, error: docEmpError } = await supabase.from("documentos_empleados").select(`
-    documento_id,
-    empleado:profiles(id, nombre, email)
-  `)
+  const admins = perfiles.filter(p => ["admin", "adminRh"].includes(p.roles?.nombre || ""))
 
-  if (docEmpError) {
-    console.error("Error al obtener asignaciones:", docEmpError)
+  if (admins.length === 0) {
+    return (
+      <div className="container mx-auto py-6">
+        <h1 className="text-2xl font-bold mb-6">Gestión de Documentos</h1>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          No hay usuarios con rol de admin.
+        </div>
+      </div>
+    )
   }
 
-  const empleadosPorDocumento = {}
-  documentosEmpleados?.forEach((asignacion) => {
+  const [documentosResult, documentosEmpleadosResult, todosEmpleadosResult] = await Promise.all([
+    supabaseServer
+      .from("documentos")
+      .select("*, creador:profiles(nombre, email)")
+      .order("created_at", { ascending: false }),
+    supabaseServer
+      .from("documentos_empleados")
+      .select("documento_id, empleado:profiles(id, nombre, email)"),
+    supabaseServer
+      .from("profiles")
+      .select("id, nombre, email")
+      .order("nombre"),
+  ])
+
+  const documentos = documentosResult.data || []
+  const documentosEmpleados = documentosEmpleadosResult.data || []
+  const todosEmpleados = todosEmpleadosResult.data || []
+
+  if (documentosResult.error) console.error("Error al obtener documentos:", documentosResult.error)
+  if (documentosEmpleadosResult.error) console.error("Error al obtener asignaciones:", documentosEmpleadosResult.error)
+
+  const empleadosPorDocumento: Record<string, any[]> = {}
+  documentosEmpleados.forEach((asignacion) => {
     if (!empleadosPorDocumento[asignacion.documento_id]) {
       empleadosPorDocumento[asignacion.documento_id] = []
     }
@@ -83,10 +71,6 @@ export default async function GestionDocumentosPage() {
     ...doc,
     empleados: empleadosPorDocumento[doc.id] || [],
   }))
-
-  const { data: todosEmpleados } = await supabase.from("profiles").select("id, nombre, email").order("nombre")
-
-  console.log("Documentos con datos de creador:", documentosConEmpleados)
 
   return (
     <div className="container mx-auto py-6">
@@ -101,8 +85,10 @@ export default async function GestionDocumentosPage() {
         </Link>
       </div>
 
-      <DocumentosTable documentos={documentosConEmpleados || []} todosEmpleados={todosEmpleados || []} />
+      <DocumentosTable
+        documentos={documentosConEmpleados}
+        todosEmpleados={todosEmpleados}
+      />
     </div>
   )
 }
-

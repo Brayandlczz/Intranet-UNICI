@@ -1,43 +1,28 @@
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { createServerSupabase } from "./utils/supabase/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  const supabase = createServerSupabase();
+  const { data: { session } } = await supabase.auth.getSession();
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  const pathname = req.nextUrl.pathname;
 
-  const publicRoutes = ["/", "/login", "/api", "/_next", "/favicon.ico", "/diagnostico", "/diagnostico-sesion"]
-
-  const isPublicRoute = publicRoutes.some(
-    (route) => req.nextUrl.pathname === route || req.nextUrl.pathname.startsWith(route),
-  )
-
-  const isStaticFile = req.nextUrl.pathname.includes(".")
-
-  console.log(`[Middleware] Ruta: ${req.nextUrl.pathname}, Autenticado: ${!!session}`) 
+  const publicRoutes = ["/login", "/signup", "/", "/favicon.ico"];
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  const isStaticFile = pathname.includes(".");
 
   if (!session && !isPublicRoute && !isStaticFile) {
-    console.log(`[Middleware] Redirigiendo a login desde: ${req.nextUrl.pathname}`)
-    const redirectUrl = req.nextUrl.clone()
-    redirectUrl.pathname = "/"
-    return NextResponse.redirect(redirectUrl)
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (session && req.nextUrl.pathname === "/") {
-    console.log("[Middleware] Usuario autenticado redirigiendo a dashboard")
-    const redirectUrl = req.nextUrl.clone()
-    redirectUrl.pathname = "/dashboard"
-    return NextResponse.redirect(redirectUrl)
+  if (session && (pathname === "/" || pathname === "/login")) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  return res
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
-}
-
+  matcher: ["/((?!_next/static|favicon.ico).*)"],
+};

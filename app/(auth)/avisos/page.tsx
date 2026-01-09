@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { supabase } from "@/utils/supabase/client" 
 import { Mosaic } from "react-loading-indicators"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
@@ -12,7 +12,6 @@ export default function AvisosPageClient() {
   const [avisos, setAvisos] = useState<Aviso[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     async function cargarAvisos() {

@@ -1,49 +1,50 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/utils/supabase/client";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-  const supabase = createClientComponentClient()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) router.push("/dashboard")
-    }
-    checkSession()
-  }, [router, supabase])
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) router.push("/dashboard");
+    };
+    checkSession();
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) throw error
-      setError("¡Inicio de sesión exitoso! Redirigiendo...")
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+
+      setError("¡Inicio de sesión exitoso! Redirigiendo...");
       setTimeout(() => {
-        router.push("/dashboard")
-        router.refresh()
-      }, 1500)
+        router.push("/dashboard");
+        router.refresh();
+      }, 1500);
     } catch (error: any) {
-      setError(error.message || "Error al iniciar sesión")
+      setError(error.message || "Error al iniciar sesión");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-5xl flex flex-col md:flex-row transition-all duration-300">
         
+        {/* Lado izquierdo */}
         <div className="bg-blue-700 text-white p-10 md:w-1/2 flex flex-col justify-center items-center">
           <img src="/logo-blanco.png" alt="Logo UNICI" className="w-36 h-auto mb-6 drop-shadow-lg" />
           <h1 className="text-3xl font-extrabold mb-3 text-center tracking-wide">PORTAL UNICI</h1>
@@ -52,6 +53,7 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {/* Lado derecho - formulario */}
         <div className="p-10 md:w-1/2 flex flex-col justify-center bg-white">
           <h2 className="text-3xl text-center font-bold text-gray-800 mb-2">Intranet UNICI</h2>
           <p className="text-center text-gray-600 mb-6">Accede con tus credenciales institucionales</p>
@@ -110,5 +112,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

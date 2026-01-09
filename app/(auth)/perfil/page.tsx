@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { Mosaic } from "react-loading-indicators"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { supabase } from "@/utils/supabase/client" 
 import { User, Pencil, Save, X, Upload, AlertTriangle } from "lucide-react"
 
 type Profile = {
@@ -49,7 +49,6 @@ export default function PerfilPage() {
   const [activeTab, setActiveTab] = useState("personal")
   const [debugInfo, setDebugInfo] = useState<string[]>([])
   const [usingSampleData, setUsingSampleData] = useState(false)
-  const supabase = createClientComponentClient()
 
   const addDebugInfo = (info: string) => {
     setDebugInfo((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${info}`])

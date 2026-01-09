@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/utils/supabase/client" 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Home, Search } from "lucide-react";
@@ -25,7 +25,6 @@ const carouselImages = ["/carousel_1.webp", "/carousel_2.webp", "/carousel_3.web
 const FADE_DURATION = 2000;
 
 const Blog: React.FC = () => {
-  const supabase = createClientComponentClient();
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [search, setSearch] = useState("");

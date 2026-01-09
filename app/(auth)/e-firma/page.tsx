@@ -2,13 +2,12 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Upload } from "lucide-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/utils/supabase/client" 
 import { Mosaic } from "react-loading-indicators";
 
 export default function UploadArchivo() {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(true); 
-  const supabase = createClientComponentClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

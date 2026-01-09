@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { Mosaic} from "react-loading-indicators"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { supabase } from "@/utils/supabase/client" 
 
 export default function SolicitudIncapacidadesForm() {
   const [perfil, setPerfil] = useState<null | {
@@ -25,7 +25,6 @@ export default function SolicitudIncapacidadesForm() {
   const fechaActual = new Date().toISOString().split("T")[0]
 
   useEffect(() => {
-    const supabase = createClientComponentClient()
 
     const fetchPerfil = async () => {
       setLoading(true)
@@ -65,7 +64,6 @@ export default function SolicitudIncapacidadesForm() {
   }, [])
 
   const handleSubmit = async (formData: any) => {
-    const supabase = createClientComponentClient()
 
     if(!perfil){
       return { success: false, message: "No se pudo obtener el perfil del usuario."}

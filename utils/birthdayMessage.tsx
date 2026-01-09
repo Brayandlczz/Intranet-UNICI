@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { gsap } from "gsap"
 import Confetti from "react-confetti"
 import { useWindowSize } from "@/utils/birthday-fetti"
+import { supabase } from "@/utils/supabase/client"
 
 interface BirthdayMessageProps {
   userId: string
@@ -21,7 +21,6 @@ export default function BirthdayMessage({
   charsPerTick = 1,
   ticksPerChar = 3,
 }: BirthdayMessageProps) {
-  const supabase = createClientComponentClient()
   const birthdayTextRef = useRef<HTMLParagraphElement>(null)
   const { width, height } = useWindowSize()
 
@@ -47,36 +46,39 @@ export default function BirthdayMessage({
         const today = new Date()
         const birthDate = new Date(profile.fecha_nacimiento + "T00:00:00")
 
-        const sameDay = today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth()
+        const sameDay =
+          today.getDate() === birthDate.getDate() &&
+          today.getMonth() === birthDate.getMonth()
+
         setIsBirthday(sameDay)
-        
+
         if (sameDay && !birthdayShownThisSession) {
           setShouldShowAnimation(true)
-          birthdayShownThisSession = true 
+          birthdayShownThisSession = true
         }
       }
     }
+
     checkBirthday()
-  }, [userId, supabase])
+  }, [userId])
 
   useEffect(() => {
-    if (shouldShowAnimation) {
-      setShowConfetti(true)
-      setConfettiVisible(true)
+    if (!shouldShowAnimation) return
 
-      const fadeOutTimer = setTimeout(() => setConfettiVisible(false), 10000)
-      const hideTimer = setTimeout(() => setShowConfetti(false), 12000)
+    setShowConfetti(true)
+    setConfettiVisible(true)
 
-      return () => {
-        clearTimeout(fadeOutTimer)
-        clearTimeout(hideTimer)
-      }
+    const fadeOutTimer = setTimeout(() => setConfettiVisible(false), 10000)
+    const hideTimer = setTimeout(() => setShowConfetti(false), 12000)
+
+    return () => {
+      clearTimeout(fadeOutTimer)
+      clearTimeout(hideTimer)
     }
   }, [shouldShowAnimation])
 
   useEffect(() => {
-    if (!birthdayTextRef.current) return
-    if (!shouldShowAnimation) return
+    if (!birthdayTextRef.current || !shouldShowAnimation) return
 
     const el = birthdayTextRef.current
     el.textContent = ""
@@ -101,15 +103,14 @@ export default function BirthdayMessage({
     }
 
     gsap.ticker.add(type)
-    return () => {
-      gsap.ticker.remove(type)
-    }
+    return () => gsap.ticker.remove(type)
   }, [message, charsPerTick, ticksPerChar, shouldShowAnimation])
 
   if (!shouldShowAnimation) return null
 
   return (
     <>
+      {/* Fondo confeti */}
       <div
         className={`fixed top-0 left-0 w-full h-full z-50 transition-opacity duration-1000 ${
           confettiVisible ? "opacity-100 pointer-events-none" : "opacity-0 pointer-events-none"
@@ -120,6 +121,7 @@ export default function BirthdayMessage({
         {showConfetti && <Confetti width={width} height={height} numberOfPieces={400} recycle={true} />}
       </div>
 
+      {/* Mensaje de cumpleaños */}
       <p
         ref={birthdayTextRef}
         className="font-bold select-none text-center text-xl md:text-2xl lg:text-3xl break-words"

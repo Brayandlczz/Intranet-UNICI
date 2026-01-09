@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { PlusIcon, TrashIcon, PencilIcon, FileIcon, DownloadIcon } from "lucide-react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { supabase } from "@/utils/supabase/client" 
 import { toast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
@@ -30,8 +30,6 @@ export default function AdminAnnouncementsPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
-
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     fetchAnnouncements()
